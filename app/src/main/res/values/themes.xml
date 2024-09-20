@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/theme </item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/applogo </item>
+        <item name="postSplashScreenTheme">@style/Theme.SmartPest</item>
+    </style>
+    
+    <style name="Theme.SmartPest" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
