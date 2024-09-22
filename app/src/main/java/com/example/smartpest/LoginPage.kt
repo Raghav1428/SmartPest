@@ -45,12 +45,12 @@ fun LoginPage(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(150.dp))
 
-            var username by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
 
             OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
+                value = email,
+                onValueChange = { email = it },
                 label = { Text("Username") }
             )
 

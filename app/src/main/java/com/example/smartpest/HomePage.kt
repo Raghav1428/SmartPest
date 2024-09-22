@@ -4,14 +4,19 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,80 +24,53 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Welcome") }
+                title = {
+                    Text(
+                        text = "Welcome",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = Color.White,
+                            fontSize = 20.sp
+                        )
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     ) {
-        Column(
+        val cardItems = listOf(
+            CardItem("PestDisease AI", R.drawable.finalaidetector),
+            CardItem("Expert Support", R.drawable.finalexpertsupport),
+            CardItem("Weather Report", R.drawable.finalweatherreport),
+            CardItem("Farm Guide", R.drawable.finalfarmguide),
+            CardItem("Nearby Shops", R.drawable.finalnearbystores),
+            CardItem("Local Alerts", R.drawable.finallocalalert)
+        )
+
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .padding(top=70.dp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(top = 88.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // First row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
+            items(cardItems) { item ->
                 ClickableCard(
                     navController = navController,
-                    title = "PestDisease AI",
-                    imageResource = R.drawable.aidetector
-                )
-                ClickableCard(
-                    navController = navController,
-                    title = "Expert Support",
-                    imageResource = R.drawable.expertsupport
-                )
-            }
-
-            // Second row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                ClickableCard(
-                    navController = navController,
-                    title = "Weather Report",
-                    imageResource = R.drawable.weatherreport
-                )
-                ClickableCard(
-                    navController = navController,
-                    title = "Local Alerts",
-                    imageResource = R.drawable.localalert
-                )
-            }
-
-            // Third row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                ClickableCard(
-                    navController = navController,
-                    title = "Nearby Shops",
-                    imageResource = R.drawable.nearbyshops
-                )
-                ClickableCard(
-                    navController = navController,
-                    title = "Farm Guide",
-                    imageResource = R.drawable.farmguide
+                    title = item.title,
+                    imageResource = item.imageResource
                 )
             }
         }
@@ -101,65 +79,65 @@ fun HomePage(navController: NavHostController) {
 
 @Composable
 fun ClickableCard(navController: NavHostController, title: String, imageResource: Int) {
+    var scale by remember { mutableStateOf(1f) }
+
     Card(
         modifier = Modifier
-            .size(150.dp)
+            .fillMaxWidth()
+            .height(160.dp)
             .padding(8.dp)
+            .padding(horizontal = 16.dp)
+            .background(Color.White)
             .clickable {
                 when (title) {
                     "PestDisease AI" -> navController.navigate("PestDiseaseAI")
                     "Expert Support" -> navController.navigate("ExpertSupport")
                     "Weather Report" -> navController.navigate("WeatherReport")
-                    "Local Alerts" -> navController.navigate("LocalAlerts")
-                    "Nearby Shops" -> navController.navigate("NearbyShops")
                     "Farm Guide" -> navController.navigate("FarmGuide")
+                    "Nearby Shops" -> navController.navigate("NearbyShops")
+                    "Local Alerts" -> navController.navigate("LocalAlerts")
                 }
             },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black
-                        ),
-                        startY = 200f
-                    )
-                ),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            // Image with custom zoom functionality using pointerInput
+            Box(
+                modifier = Modifier
+                    .size(150.dp)
+                    .graphicsLayer(scaleX = scale, scaleY = scale)
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, _, zoom, _ ->
+                            scale *= zoom
+                        }
+                    }
             ) {
-                Text(
-                    text = title,
-                    color = Color.Blue, // Assuming white text for better visibility
-                    fontSize = 14.sp, // Adjust font size as needed
-                    modifier = Modifier.padding(top = 8.dp) // Add some padding above the text
-                )
                 Image(
                     painter = painterResource(id = imageResource),
                     contentDescription = title,
-                    modifier = Modifier
-                        .size(300.dp)
-                        .padding(0.dp),
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                Text(
-                    text = title,
-                    color = Color.Blue, // Assuming white text for better visibility
-                    fontSize = 14.sp, // Adjust font size as needed
-                    modifier = Modifier.padding(top = 8.dp) // Add some padding above the text
-                )
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 22.sp,
+                fontWeight = FontWeight(600),
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }
+
+data class CardItem(val title: String, val imageResource: Int)
 
 @Preview(showBackground = true)
 @Composable

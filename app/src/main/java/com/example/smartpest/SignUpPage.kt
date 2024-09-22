@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,7 +18,15 @@ import androidx.navigation.NavHostController
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SignUpPage(navController: NavHostController) {
+fun SignUpPage(navController: NavHostController, authViewModel: AuthViewModel) {
+//     var email by remember {
+//         mutableStateOf("")
+//     }
+//
+//    var password by remember {
+//        mutableStateOf("")
+//    }
+    val authState = authViewModel.authState.observeAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -48,11 +57,11 @@ fun SignUpPage(navController: NavHostController) {
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(150.dp))
-            var username by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
+                value = email,
+                onValueChange = { email = it },
                 label = { Text("Username") }
             )
             PasswordField(
@@ -61,7 +70,9 @@ fun SignUpPage(navController: NavHostController) {
                 label = "Password"
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { /* Handle sign up */ }) {
+            Button(onClick = {
+                authViewModel.signup(email, password)
+            }) {
                 Text("Sign Up")
             }
         }

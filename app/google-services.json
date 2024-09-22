@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325526692187",
+    "project_id": "farmfix-88fe0",
+    "storage_bucket": "farmfix-88fe0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325526692187:android:9c546ea4688f7780fa3a7e",
+        "android_client_info": {
+          "package_name": "com.example.farmfix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIE9ZwEknLmUTAF3m2tAU4uHQuEYt-n3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
