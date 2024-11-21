@@ -64,7 +64,7 @@ object TensorFlowHelper {
                 "Tomato early blight", "Tomato bacterial spot"
             )
 
-            // Close the model to free resources
+            //close the model for resource management of the app
             model.close()
 
             Log.d("TensorFlowHelper", "Returning classification result: ${classes[maxPos]}")

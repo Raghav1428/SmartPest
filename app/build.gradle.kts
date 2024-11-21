@@ -1,7 +1,10 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -19,6 +22,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        //Gemini API Key
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        val geminiApiKey = properties.getProperty("GEMINI_API_KEY") ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -40,6 +49,7 @@ android {
     buildFeatures {
         compose = true
         mlModelBinding = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -83,6 +93,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.common.ktx)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -100,8 +112,12 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
 
     // Firebase Authentication
-    implementation(platform("com.google.firebase:firebase-bom:32.0.0"))
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.com.google.firebase.firebase.auth.ktx)
+    implementation(platform(libs.firebase.bom.v3200))
+
+
 
     implementation(libs.androidx.runtime.livedata)
 
@@ -117,5 +133,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Google Generative AI
-    implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+    implementation(libs.generativeai)
+//    implementation(libs.generativeai.client)
+
 }

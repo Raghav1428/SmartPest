@@ -9,14 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Icon
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,19 +32,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.smartpest.ui.theme.modelMessage
 import com.example.smartpest.ui.theme.userMessage
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
+import com.example.smartpest.viewmodels.ChatViewModel
+import com.example.smartpest.viewmodels.MessageModel
 
 @Composable
 fun ChatPage(modifier: Modifier = Modifier, viewModel: ChatViewModel) {
     Column(
         modifier = modifier
     ) {
-        //AppHeader()
-        MessageList(modifier = Modifier.weight(1f), messageList = viewModel.messageList)
-        MessageInput(onMesageSend = {
+        MessageList(
+            modifier = Modifier
+                .weight(1f),
+            messageList = viewModel.messageList
+        )
+        MessageInput(onMessageSend = {
             viewModel.sendMessage(it)
         }
         )
@@ -47,49 +59,62 @@ fun ChatPage(modifier: Modifier = Modifier, viewModel: ChatViewModel) {
 }
 
 @Composable
-fun AppHeader() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(16.dp),
-            text = "Farm.ai",
-            color = Color.White,
-            fontSize = 22.sp
-        )
-    }
-}
-
-@Composable
-fun MessageInput(onMesageSend: (String) -> Unit) {
+fun MessageInput(onMessageSend: (String) -> Unit) {
 
     var message by remember {
         mutableStateOf("")
     }
 
+    val backgroundColor = MaterialTheme.colorScheme.surface
+    val textColor = MaterialTheme.colorScheme.onSurface
+
     Row(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .background(backgroundColor, shape = RoundedCornerShape(12.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(start = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
-            modifier = Modifier.weight(1f),
             value = message,
             onValueChange = {
                 message = it
-            }
+            },
+            placeholder = {
+                Text(text = "Type your message here...", color = textColor.copy(alpha = 0.6f))
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedLabelColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
+                cursorColor = textColor,
+            ),
+            modifier = Modifier
+                .weight(1f),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Send
+            ),
+
+            keyboardActions = KeyboardActions(onSend = {
+                if (message.isNotEmpty()) {
+                    onMessageSend(message)
+                    message = ""
+                }
+            })
         )
         IconButton(onClick = {
             if (message.isNotEmpty()) {
-                onMesageSend(message)
+                onMessageSend(message)
                 message = ""
             }
 
         }) {
             Icon(
-                imageVector = Icons.Default.Send,
+                imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send"
             )
         }
@@ -98,30 +123,6 @@ fun MessageInput(onMesageSend: (String) -> Unit) {
 
 @Composable
 fun MessageList(modifier: Modifier = Modifier, messageList: List<MessageModel>) {
-//    if(messageList.isEmpty()) {
-//        Column(
-//            modifier = Modifier.fillMaxSize(),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center
-//        ) {
-//            Icon(
-//                modifier = Modifier.size(40.dp),
-//                painter = painterResource(R.drawable.baseline_question_answer_24),
-//                contentDescription = "Icon",
-//                tint = Purple80
-//            )
-//            Text(text = "Ask me Anything", fontSize = 22.sp)
-//        }
-//    } else {
-//        LazyColumn(
-//            modifier = modifier,
-//            reverseLayout = true
-//        ) {
-//            items(messageList.reversed()) {
-//                MessageRole(messageModel = it)
-//            }
-//        }
-//    }
     LazyColumn(
         modifier = modifier,
         reverseLayout = true

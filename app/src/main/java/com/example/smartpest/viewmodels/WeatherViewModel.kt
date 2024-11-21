@@ -1,4 +1,4 @@
-package com.example.smartpest
+package com.example.smartpest.viewmodels
 
 import android.net.http.HttpException
 import android.os.Build

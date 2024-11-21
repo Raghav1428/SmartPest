@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.smartpest.api.NetworkResponse
 import com.example.smartpest.api.WeatherModel
+import com.example.smartpest.viewmodels.WeatherViewModel
 
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
