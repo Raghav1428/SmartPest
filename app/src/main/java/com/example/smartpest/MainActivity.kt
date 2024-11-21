@@ -79,7 +79,8 @@ fun MyApp(themeViewModel: ThemeViewModel) {
         "Weather Report",
         "Local Alerts",
         "Nearby Shops",
-        "Farm Guide"
+        "Farm Guide",
+        "Profile Page"
     )
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
@@ -131,7 +132,7 @@ fun MyApp(themeViewModel: ThemeViewModel) {
                     composable("Local Alerts") { LocalAlerts(navController) }
                     composable("Nearby Shops") { NearbyShops(navController) }
                     composable("Farm Guide") { FarmGuide(navController) }
-                    composable("Profile Page") { ProfilePage(navController) }
+                    composable("Profile Page") { ProfilePage(navController, authViewModel) }
                 }
             }
         }
@@ -152,7 +153,7 @@ fun BottomNavigationBar(navController: NavHostController) {
             "Profile",
             Icons.Filled.AccountCircle,
             Icons.Outlined.AccountCircle,
-            route = "ProfilePage"
+            route = "Profile Page"
         )
     )
 
