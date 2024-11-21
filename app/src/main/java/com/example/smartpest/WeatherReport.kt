@@ -130,8 +130,9 @@ fun WeatherDetails(data: WeatherModel) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
         Text(
-            text = " ${data.current.temp_c} ° c",
+            text = " ${data.current.temp_c} ° C",
             fontSize = 56.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -148,7 +149,9 @@ fun WeatherDetails(data: WeatherModel) {
             textAlign = TextAlign.Center,
             color = Color.Gray
         )
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Card {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -158,14 +161,15 @@ fun WeatherDetails(data: WeatherModel) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     WeatherKeyVal("Humidity", data.current.humidity)
-                    WeatherKeyVal("Wind Speed", data.current.wind_kph + " km/h")
+                    WeatherKeyVal("Participation", data.current.precip_mm + " mm")
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    WeatherKeyVal("UV", data.current.uv)
-                    WeatherKeyVal("Participation", data.current.precip_mm + " mm")
+                    WeatherKeyVal("Wind Speed", data.current.wind_kph + " km/h")
+                    WeatherKeyVal("Wind Direction", data.current.wind_degree + "° ${data.current.wind_dir}")
+
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),

@@ -28,6 +28,11 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
         val geminiApiKey = properties.getProperty("GEMINI_API_KEY") ?: ""
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+
+        //Weather API Key
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        val weatherApiKey = properties.getProperty("WEATHER_API_KEY") ?: ""
+        buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
     }
 
     buildTypes {
@@ -103,11 +108,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //Retrofit
     implementation (libs.retrofit.v2110)
     implementation (libs.converter.gson.v2110)
+    implementation(libs.androidx.runtime.livedata.v166)
+    implementation(libs.coil.compose)//image loading
 
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.6")
-    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
 
@@ -116,10 +122,6 @@ dependencies {
     implementation(libs.google.firebase.auth.ktx)
     implementation(libs.com.google.firebase.firebase.auth.ktx)
     implementation(platform(libs.firebase.bom.v3200))
-
-
-
-    implementation(libs.androidx.runtime.livedata)
 
     // Testing dependencies
     testImplementation(libs.junit)
