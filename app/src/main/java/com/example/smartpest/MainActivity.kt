@@ -37,26 +37,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import com.example.smartpest.database.DatabaseProvider
 import com.example.smartpest.viewmodels.AuthState
 import com.example.smartpest.viewmodels.AuthViewModel
 import com.example.smartpest.viewmodels.ThemeViewModel
+import com.example.smartpest.viewmodels.UserViewModel
 import com.example.smartpest.viewmodels.WeatherViewModel
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var userViewModel: UserViewModel
+
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         installSplashScreen()
         enableEdgeToEdge()
+
+        val database = DatabaseProvider.getDatabase(this)
+        val userViewModelFactory = DatabaseProvider.UserViewModelFactory(database.userDao)
+        userViewModel = ViewModelProvider(this, userViewModelFactory)[UserViewModel::class.java]
+
         setContent {
             val themeViewModel: ThemeViewModel = viewModel()
-            MyApp(themeViewModel)
+            MyApp(themeViewModel, userViewModel)
         }
     }
 }
@@ -64,7 +75,8 @@ class MainActivity : ComponentActivity() {
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp(themeViewModel: ThemeViewModel) {
+fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
+
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val weatherViewModel: WeatherViewModel = viewModel()
@@ -132,7 +144,13 @@ fun MyApp(themeViewModel: ThemeViewModel) {
                     composable("Local Alerts") { LocalAlerts(navController) }
                     composable("Nearby Shops") { NearbyShops(navController) }
                     composable("Farm Guide") { FarmGuide(navController) }
-                    composable("Profile Page") { ProfilePage(navController, authViewModel) }
+                    composable("Profile Page") {
+                        ProfilePage(
+                            navController,
+                            authViewModel,
+                            userViewModel = userViewModel
+                        )
+                    }
                 }
             }
         }

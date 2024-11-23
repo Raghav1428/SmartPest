@@ -150,9 +150,3 @@ fun ShopItem(shop: Shop) {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewNearbyShops() {
-    NearbyShops(navController = rememberNavController())
-}

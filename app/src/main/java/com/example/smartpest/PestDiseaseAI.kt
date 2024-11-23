@@ -189,9 +189,3 @@ private fun loadBitmapFromUri(uri: Uri, context: android.content.Context): Bitma
         null
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewPestDiseaseAI() {
-    PestDiseaseAI(navController = rememberNavController())
-}

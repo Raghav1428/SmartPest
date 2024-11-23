@@ -22,23 +22,24 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.smartpest.database.UserEvent
 import com.example.smartpest.viewmodels.AuthState
 import com.example.smartpest.viewmodels.AuthViewModel
+import com.example.smartpest.viewmodels.UserViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel) {
-    var name by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var selectedLanguage by remember { mutableStateOf("English") }
+fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel, userViewModel: UserViewModel) {
 
+    val state by userViewModel.state.collectAsState()
+    //Changing the language
     val languages = listOf("English", "Spanish", "French", "German", "Hindi")
     var isChanged by remember { mutableStateOf(false) }
 
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
     val authState by authViewModel.authState.observeAsState()
     val context = LocalContext.current
+
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.PasswordResetEmailSent -> {
@@ -64,10 +65,10 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel) 
 
             // Name Field
             OutlinedTextField(
-                value = name,
+                value = state.name,
                 onValueChange = {
+                    userViewModel.onEvent(UserEvent.SetName(it))
                     isChanged = true
-                    name = it
                 },
                 label = { Text("Name") },
                 leadingIcon = {
@@ -82,10 +83,10 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel) 
 
             // Location Field
             OutlinedTextField(
-                value = location,
+                value = state.location,
                 onValueChange = {
+                    userViewModel.onEvent(UserEvent.SetLocation(it))
                     isChanged = true
-                    location = it
                 },
                 label = { Text("Location") },
                 leadingIcon = {
@@ -100,10 +101,10 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel) 
 
             // Phone Field
             OutlinedTextField(
-                value = phone,
+                value = state.phone,
                 onValueChange = {
+                    userViewModel.onEvent(UserEvent.SetPhone(it))
                     isChanged = true
-                    phone = it
                 },
                 label = { Text("Phone") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -119,19 +120,19 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel) 
 
             // Language Dropdown
             DropdownMenuField(
-                selectedItem = selectedLanguage,
+                selectedItem = state.language,
                 items = languages,
                 onItemSelected = {
+                    userViewModel.onEvent(UserEvent.SetLanguage(it))
                     isChanged = true
-                    selectedLanguage = it
                 }
             )
 
             // Save Button
             Button(
                 onClick = {
-                    // Handle save logic here
-                    Toast.makeText(context, "Changes saved", Toast.LENGTH_SHORT).show()
+                    userViewModel.onEvent(UserEvent.SaveUser)
+                    Toast.makeText(context,"Changes saved", Toast.LENGTH_SHORT).show()
                     isChanged = false
                 },
                 enabled = isChanged,
