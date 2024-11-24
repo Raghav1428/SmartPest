@@ -160,18 +160,18 @@ fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        //NavigationItem("Home", Icons.Filled.Home, Icons.Outlined.Home, route = "Home"),
+
+        NavigationItem(
+            "Home",
+            Icons.Filled.Home,
+            Icons.Outlined.Home,
+            route = "Home"
+        ),
         NavigationItem(
             "PestDisease.AI",
             Icons.Filled.Camera,
             Icons.Outlined.Camera,
             route = "PestDisease.AI"
-        ),
-        NavigationItem(
-            "Profile",
-            Icons.Filled.AccountCircle,
-            Icons.Outlined.AccountCircle,
-            route = "Profile Page"
         )
     )
 
@@ -208,7 +208,13 @@ fun DrawerContent(
 ) {
     val scope = rememberCoroutineScope()
     val items = listOf(
-        NavigationItem("Home", Icons.Filled.Home, Icons.Outlined.Home, route = "Home"),
+
+        NavigationItem(
+            "Home",
+            Icons.Filled.Home,
+            Icons.Outlined.Home,
+            route = "Home"
+        ),
         NavigationItem(
             "AI Assistant",
             Icons.AutoMirrored.Filled.Chat,
@@ -233,6 +239,11 @@ fun DrawerContent(
             Icons.Filled.Notifications,
             Icons.Outlined.Notifications,
             route = "Local Alerts"
+        ),
+        NavigationItem("Profile",
+            Icons.Filled.AccountCircle,
+            Icons.Outlined.AccountCircle,
+            route = "Profile Page"
         ),
         NavigationItem(
             "Log Out",

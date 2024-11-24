@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -156,9 +157,10 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel, 
             }
 
             // Privacy Policy
+            val uriHandler = LocalUriHandler.current
             TextButton(
                 onClick = {
-                    navController.navigate("")
+                    uriHandler.openUri("https://www.google.com")
                 }
             ) {
                 Text("Privacy Policy")
