@@ -14,8 +14,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,15 +26,11 @@ import androidx.navigation.NavHostController
 import com.example.smartpest.models.TensorFlowHelper.imageSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import com.example.smartpest.models.TensorFlowHelper
 import java.io.IOException
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PestDiseaseAI(navController: NavHostController) {
@@ -56,29 +50,6 @@ fun PestDiseaseAI(navController: NavHostController) {
     )
 
     Scaffold(
-        topBar = {
-            androidx.compose.material3.TopAppBar(
-                title = {
-                    androidx.compose.material3.Text(
-                        text = "Pest and Disease Detector",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                navigationIcon = {
-                    androidx.compose.material3.IconButton(onClick = { navController.popBackStack() }) {
-                        androidx.compose.material3.Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
     ) {
         Column(
             modifier = Modifier

@@ -124,11 +124,6 @@ fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
                         )
                     }
                 },
-                bottomBar = {
-                    if (currentRoute in mainRoutes) {
-                        BottomNavigationBar(navController)
-                    }
-                }
             ) { innerPadding ->
                 NavHost(
                     navController = navController,
@@ -158,48 +153,6 @@ fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf(
-
-        NavigationItem(
-            "Home",
-            Icons.Filled.Home,
-            Icons.Outlined.Home,
-            route = "Home"
-        ),
-        NavigationItem(
-            "PestDisease.AI",
-            Icons.Filled.Camera,
-            Icons.Outlined.Camera,
-            route = "PestDisease.AI"
-        )
-    )
-
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-
-    NavigationBar {
-        items.forEach { item ->
-            NavigationBarItem(
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(
-                        if (currentRoute == item.route) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.title
-                    )
-                },
-                label = { Text(item.title) }
-            )
-        }
-    }
-}
-
-@Composable
 fun DrawerContent(
     navController: NavHostController,
     authViewModel: AuthViewModel,
@@ -214,6 +167,12 @@ fun DrawerContent(
             Icons.Filled.Home,
             Icons.Outlined.Home,
             route = "Home"
+        ),
+        NavigationItem(
+            "PestDisease.AI",
+            Icons.Filled.Camera,
+            Icons.Outlined.Camera,
+            route = "PestDisease.AI"
         ),
         NavigationItem(
             "AI Assistant",
