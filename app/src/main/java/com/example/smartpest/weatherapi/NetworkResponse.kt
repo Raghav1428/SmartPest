@@ -1,4 +1,4 @@
-package com.example.smartpest.api
+package com.example.smartpest.weatherapi
 
 sealed class NetworkResponse<out T> {
     data class Success<out T>(val data:T): NetworkResponse<T>()

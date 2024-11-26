@@ -1,4 +1,4 @@
-package com.example.smartpest.api
+package com.example.smartpest.weatherapi
 
 data class Location(
     val country: String,

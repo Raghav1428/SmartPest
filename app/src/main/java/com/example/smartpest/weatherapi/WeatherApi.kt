@@ -1,4 +1,4 @@
-package com.example.smartpest.api
+package com.example.smartpest.weatherapi
 
 import retrofit2.Response
 import retrofit2.http.GET

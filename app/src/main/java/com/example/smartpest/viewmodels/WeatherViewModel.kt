@@ -7,9 +7,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.smartpest.api.NetworkResponse
-import com.example.smartpest.api.RetrofitInstance
-import com.example.smartpest.api.WeatherModel
+import com.example.smartpest.weatherapi.NetworkResponse
+import com.example.smartpest.weatherapi.RetrofitInstance
+import com.example.smartpest.weatherapi.WeatherModel
 import com.example.smartpest.BuildConfig
 import kotlinx.coroutines.launch
 import java.io.IOException

@@ -1,4 +1,4 @@
-package com.example.smartpest
+package com.example.smartpest.models
 
 import android.app.Application
 import com.example.smartpest.database.AppDatabase

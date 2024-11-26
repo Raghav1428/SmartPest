@@ -1,4 +1,4 @@
-package com.example.smartpest
+package com.example.smartpest.view
 
 import android.annotation.SuppressLint
 import android.widget.Toast

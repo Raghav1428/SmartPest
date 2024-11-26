@@ -1,4 +1,4 @@
-package com.example.smartpest
+package com.example.smartpest.view
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
@@ -35,8 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.smartpest.api.NetworkResponse
-import com.example.smartpest.api.WeatherModel
+import com.example.smartpest.weatherapi.NetworkResponse
+import com.example.smartpest.weatherapi.WeatherModel
 import com.example.smartpest.viewmodels.WeatherViewModel
 
 

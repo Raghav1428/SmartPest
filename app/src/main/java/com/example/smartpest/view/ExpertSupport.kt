@@ -1,4 +1,4 @@
-package com.example.smartpest
+package com.example.smartpest.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.smartpest.models.ChatPage
 import com.example.smartpest.viewmodels.ChatViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

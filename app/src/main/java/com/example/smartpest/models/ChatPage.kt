@@ -1,4 +1,4 @@
-package com.example.smartpest
+package com.example.smartpest.models
 
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.background
