@@ -130,21 +130,35 @@ fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
                     startDestination = startDestination,
                     Modifier.padding(innerPadding)
                 ) {
-                    composable("login") { LoginPage(navController, authViewModel) }
-                    composable("signup") { SignUpPage(navController, authViewModel) }
-                    composable("Home") { HomePage(navController) }
-                    composable("PestDisease.AI") { PestDiseaseAI(navController) }
-                    composable("AI Assistant") { ExpertSupport(navController) }
-                    composable("Weather Report") { WeatherReport(weatherViewModel) }
-                    composable("Local Alerts") { LocalAlerts(navController) }
-                    composable("Nearby Shops") { NearbyShops(navController) }
-                    composable("Farm Guide") { FarmGuide(navController) }
+                    composable("login") {
+                        LoginPage(navController, authViewModel)
+                    }
+                    composable("signup") {
+                        SignUpPage(navController, authViewModel)
+                    }
+                    composable("Home") {
+                        HomePage(navController)
+                    }
+                    composable("PestDisease.AI") {
+                        PestDiseaseAI(navController)
+                    }
+                    composable("AI Assistant") {
+                        ExpertSupport(navController)
+                    }
+                    composable("Weather Report") {
+                        WeatherReport(weatherViewModel)
+                    }
+                    composable("Local Alerts") {
+                        LocalAlerts(navController)
+                    }
+                    composable("Nearby Shops") {
+                        NearbyShops(navController)
+                    }
+                    composable("Farm Guide") {
+                        FarmGuide(navController)
+                    }
                     composable("Profile Page") {
-                        ProfilePage(
-                            navController,
-                            authViewModel,
-                            userViewModel = userViewModel
-                        )
+                        ProfilePage(authViewModel, userViewModel)
                     }
                 }
             }
@@ -199,7 +213,8 @@ fun DrawerContent(
             Icons.Outlined.Notifications,
             route = "Local Alerts"
         ),
-        NavigationItem("Profile",
+        NavigationItem(
+            "Profile",
             Icons.Filled.AccountCircle,
             Icons.Outlined.AccountCircle,
             route = "Profile Page"

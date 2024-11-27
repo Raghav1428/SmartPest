@@ -16,33 +16,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FarmGuide(navController: NavHostController) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Farmer's Guide",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 0.dp)
     ) {
         // Add padding to the top (e.g., 16.dp) and display the problems list
         ProblemList(
@@ -92,7 +71,7 @@ fun FarmGuide(navController: NavHostController) {
                     "Use salt-tolerant crops and implement improved irrigation management techniques."
                 ),
                 ProblemItem(
-                    "Flooding and Waterlogging",
+                    "Flooding and Water logging",
                     "Improve drainage systems, use raised beds, or grow flood-resistant crops."
                 ),
                 ProblemItem(

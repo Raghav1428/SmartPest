@@ -24,12 +24,15 @@ class UserViewModel(private val userDao: UserDao): ViewModel() {
         viewModelScope.launch {
             try {
                 userDao.getUser()?.let { user ->
-                    _state.update { it.copy(
-                        name = user.name,
-                        location = user.location,
-                        phone = user.phone,
-                        language = user.language
-                    ) }
+                    _state.update {
+                        it.copy(
+                            id = user.id,
+                            name = user.name,
+                            location = user.location,
+                            phone = user.phone,
+                            language = user.language
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 // Handle error if needed
@@ -51,7 +54,7 @@ class UserViewModel(private val userDao: UserDao): ViewModel() {
                 }
 
                 val user = User(
-                    id = 0,
+                    id = currentState.id,
                     name = currentState.name,
                     location = currentState.location,
                     phone = currentState.phone,

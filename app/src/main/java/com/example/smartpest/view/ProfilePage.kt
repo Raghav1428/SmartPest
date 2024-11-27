@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -22,7 +24,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.smartpest.database.UserEvent
 import com.example.smartpest.viewmodels.AuthState
 import com.example.smartpest.viewmodels.AuthViewModel
@@ -30,9 +31,10 @@ import com.example.smartpest.viewmodels.UserViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel, userViewModel: UserViewModel) {
+fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
 
     val state by userViewModel.state.collectAsState()
+
     //Changing the language
     val languages = listOf("English", "Spanish", "French", "German", "Hindi")
     var isChanged by remember { mutableStateOf(false) }
@@ -139,7 +141,8 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel, 
                 enabled = isChanged,
                 modifier = Modifier
                     .fillMaxWidth(0.3f)
-                    .align(alignment = Alignment.CenterHorizontally)
+                    .align(alignment = Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(18.dp)
             ) {
                 Text("Save")
             }
@@ -151,7 +154,8 @@ fun ProfilePage(navController: NavHostController, authViewModel: AuthViewModel, 
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.4f)
-                    .align(alignment = Alignment.CenterHorizontally)
+                    .align(alignment = Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(18.dp)
             ) {
                 Text("Reset Password")
             }
