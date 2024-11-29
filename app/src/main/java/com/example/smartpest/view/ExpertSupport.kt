@@ -18,10 +18,12 @@ fun ExpertSupport(
     chatViewModel: ChatViewModel = viewModel()
 ) {
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
     ) { innerPadding ->
         ChatPage(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding),
             chatViewModel
         )

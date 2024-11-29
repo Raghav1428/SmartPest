@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     //Hiding API Key
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    //Room
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
 }
 

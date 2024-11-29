@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,10 +21,11 @@ import androidx.navigation.NavHostController
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FarmGuide(navController: NavHostController) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 0.dp)
+            .padding(horizontal = 8.dp)
     ) {
         // Add padding to the top (e.g., 16.dp) and display the problems list
         ProblemList(
@@ -103,7 +107,7 @@ fun FarmGuide(navController: NavHostController) {
                     "Use biological control methods, crop rotation, and early detection strategies."
                 )
             ),
-            modifier = Modifier.padding(top = 98.dp)
+            modifier = Modifier.padding(top = 16.dp)
         )
     }
 }
@@ -138,20 +142,34 @@ fun ExpandableProblemItem(problemItem: ProblemItem) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = problemItem.problem,
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { isExpanded = !isExpanded }
-            )
+                    .clickable { isExpanded = !isExpanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = problemItem.problem,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
 
             if (isExpanded) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(
+                    modifier = Modifier.height(8.dp),
+                )
                 Text(
                     text = problemItem.solution,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W400
                 )
             }
         }

@@ -226,7 +226,7 @@ fun DrawerContent(
             route = "login"
         )
     )
-    var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         ModalDrawerSheet {

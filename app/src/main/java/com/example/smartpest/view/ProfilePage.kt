@@ -6,14 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -32,10 +30,8 @@ import com.example.smartpest.viewmodels.UserViewModel
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
-
     val state by userViewModel.state.collectAsState()
 
-    //Changing the language
     val languages = listOf("English", "Spanish", "French", "German", "Hindi")
     var isChanged by remember { mutableStateOf(false) }
 
@@ -58,14 +54,14 @@ fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
         }
     }
 
-    Scaffold {
+    Scaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             // Name Field
             OutlinedTextField(
                 value = state.name,
@@ -78,7 +74,7 @@ fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
                     Icon(
                         Icons.Default.Person,
                         contentDescription = null,
-                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -96,7 +92,7 @@ fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
                     Icon(
                         Icons.Default.Place,
                         contentDescription = null,
-                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -115,7 +111,7 @@ fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
                     Icon(
                         Icons.Default.Phone,
                         contentDescription = null,
-                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -135,37 +131,30 @@ fun ProfilePage(authViewModel: AuthViewModel, userViewModel: UserViewModel) {
             Button(
                 onClick = {
                     userViewModel.onEvent(UserEvent.SaveUser)
-                    Toast.makeText(context,"Changes saved", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Changes saved", Toast.LENGTH_SHORT).show()
                     isChanged = false
                 },
                 enabled = isChanged,
                 modifier = Modifier
-                    .fillMaxWidth(0.3f)
-                    .align(alignment = Alignment.CenterHorizontally),
+                    .fillMaxWidth(0.5f)
+                    .align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(18.dp)
             ) {
                 Text("Save")
             }
 
             // Reset Password Button
-            Button(
-                onClick = {
-                    showForgotPasswordDialog = true
-                },
-                modifier = Modifier
-                    .fillMaxWidth(0.4f)
-                    .align(alignment = Alignment.CenterHorizontally),
-                shape = RoundedCornerShape(18.dp)
+            TextButton(
+                onClick = { showForgotPasswordDialog = true },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("Reset Password")
+                Text("Reset Password", color = MaterialTheme.colorScheme.primary)
             }
 
             // Privacy Policy
             val uriHandler = LocalUriHandler.current
             TextButton(
-                onClick = {
-                    uriHandler.openUri("https://www.google.com")
-                }
+                onClick = { uriHandler.openUri("https://www.google.com") }
             ) {
                 Text("Privacy Policy")
             }
@@ -217,12 +206,13 @@ fun DropdownMenuField(
                 .width(with(LocalDensity.current) { textFieldWidth.value.toDp() })
         ) {
             items.forEach { item ->
-                DropdownMenuItem(onClick = {
-                    onItemSelected(item)
-                    expanded = false
-                }) {
-                    Text(item)
-                }
+                DropdownMenuItem(
+                    text = { Text(item) },
+                    onClick = {
+                        onItemSelected(item)
+                        expanded = false
+                    }
+                )
             }
         }
     }

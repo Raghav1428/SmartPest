@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.0"
+androidxMaterial3 = "2.0.1"
 cameraExtensions = "1.3.4"
 coilCompose = "2.6.0"
 converterGson = "2.9.0"
@@ -64,6 +65,7 @@ androidx-material = { module = "androidx.compose.material:material", version.ref
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-material3-v110 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+androidx-material3-v201 = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial3" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-compiler-v252 = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
