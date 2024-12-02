@@ -511,12 +511,11 @@ fun BottomSection(
                 popUpTo("onboarding") { inclusive = true }
             }
         } else {
-            // Permission denied, still proceed to login but with a warning
+            // still proceed to login but with a warning
             onGetStartedClicked()
             navController.navigate("login") {
                 popUpTo("onboarding") { inclusive = true }
             }
-            // Optionally show a toast or snackbar about permission
             Toast.makeText(
                 context,
                 "Notifications are disabled. You can enable them in settings.",
