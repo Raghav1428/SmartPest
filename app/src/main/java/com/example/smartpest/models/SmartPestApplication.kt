@@ -1,6 +1,9 @@
 package com.example.smartpest.models
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import com.example.smartpest.database.AppDatabase
 
 class SmartPestApplication : Application() {
@@ -10,5 +13,14 @@ class SmartPestApplication : Application() {
         super.onCreate()
         // Initialize database
         database
+
+        val channel = NotificationChannel(
+            "channel id",
+            "channel name",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+
     }
 }

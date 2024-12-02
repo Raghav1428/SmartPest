@@ -16,6 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.farmfix"
+        applicationId = "com.example.smartpest"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -109,6 +110,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -122,15 +125,23 @@ dependencies {
     implementation (libs.converter.gson.v2110)
     implementation(libs.androidx.runtime.livedata.v166)
     implementation(libs.coil.compose)//image loading
+    implementation("androidx.core:core-ktx:1.10.1")
 
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
 
-    // Firebase Authentication
+    //Onboarding Screen
+    implementation("com.google.accompanist:accompanist-pager:0.12.0")
+    implementation(libs.lottie.compose)
+
+    // Firebase
     implementation(platform(libs.firebase.bom))
+    // Auth
     implementation(libs.google.firebase.auth.ktx)
     implementation(libs.com.google.firebase.firebase.auth.ktx)
     implementation(platform(libs.firebase.bom.v3200))
+    // Cloud Message
+    implementation(libs.google.firebase.messaging)
 
     // Testing dependencies
     testImplementation(libs.junit)
@@ -150,4 +161,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation("androidx.room:room-ktx:2.6.1")
     ksp(libs.androidx.room.compiler)
+
+    //Notifications
+//    implementation(libs.accompanist.notifications)
 }

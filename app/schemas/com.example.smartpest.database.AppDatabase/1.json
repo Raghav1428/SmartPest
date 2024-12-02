@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "114cd0dddd7be2ce582b00e51aaab7bd",
+    "identityHash": "b7d363682c7339311d31576f53680fb2",
     "entities": [
       {
         "tableName": "user",
@@ -49,10 +49,15 @@
         "foreignKeys": []
       }
     ],
-    "views": [],
+    "views": [
+      {
+        "viewName": "Alert",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS missing query"
+      }
+    ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '114cd0dddd7be2ce582b00e51aaab7bd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7d363682c7339311d31576f53680fb2')"
     ]
   }
 }

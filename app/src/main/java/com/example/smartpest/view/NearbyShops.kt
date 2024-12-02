@@ -21,7 +21,6 @@ data class Shop(
 )
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NearbyShops(navController: NavHostController) {
     val shopList = listOf(
@@ -88,29 +87,7 @@ fun NearbyShops(navController: NavHostController) {
     )
 
     Scaffold(
-        topBar = {
-            androidx.compose.material3.TopAppBar(
-                title = {
-                    androidx.compose.material3.Text(
-                        text = "Nearby Shops",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                navigationIcon = {
-                    androidx.compose.material3.IconButton(onClick = { navController.popBackStack() }) {
-                        androidx.compose.material3.Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
+
     ) {
         ShopList(
             shopList = shopList,

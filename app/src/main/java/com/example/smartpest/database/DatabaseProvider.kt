@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import androidx.lifecycle.ViewModel
+import com.example.smartpest.viewmodels.AlertViewModel
 import com.example.smartpest.viewmodels.UserViewModel
 
 object DatabaseProvider {
@@ -28,4 +29,14 @@ object DatabaseProvider {
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+//
+//    class AlertViewModelFactory(private val alertDao: AlertDao) : ViewModelProvider.Factory {
+//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//            if (modelClass.isAssignableFrom(AlertViewModel::class.java)) {
+//                @Suppress("UNCHECKED_CAST")
+//                return AlertViewModel(alertDao) as T
+//            }
+//            throw IllegalArgumentException("Unknown ViewModel class")
+//        }
+//    }
 }
