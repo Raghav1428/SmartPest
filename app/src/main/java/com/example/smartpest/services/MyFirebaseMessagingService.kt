@@ -9,7 +9,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.smartpest.R
-import com.example.smartpest.database.Alert
+import com.example.smartpest.database.alert.Alert
 import com.example.smartpest.database.AppDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -37,20 +37,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         // Check notification payload
         remoteMessage.notification?.let {notification ->
-            showNotification(
-                notification.title ?: "SmartPest Notification",
-                notification.body ?: "You have a new update"
-            )
-//            scope.launch {
-//                val alert = Alert(
-//                    title = notification.title ?: "SmartPest Notification",
-//                    message = notification.body ?: "You have a new update",
-//                    timestamp = System.currentTimeMillis()
-//                )
-//                database.alertDao.insertAlert(alert)
-//            }
-        }
 
+            val title = notification.title ?: "SmartPest Notification"
+            val message = notification.body ?: "You have a new update"
+
+            showNotification(title,message)
+
+            //adding to db
+            scope.launch {
+                val alert = Alert(
+                    title = title,
+                    message = message,
+                    timestamp = System.currentTimeMillis()
+                )
+                database.alertDao.insertAlert(alert)
+            }
+        }
     }
 
     private fun sendRegistrationToServer(token: String) {

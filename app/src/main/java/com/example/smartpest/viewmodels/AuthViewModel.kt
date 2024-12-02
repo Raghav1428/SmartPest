@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -14,10 +13,6 @@ class AuthViewModel : ViewModel() {
     init {
         _authState.value = AuthState.Loading
         checkAuthStatus()
-    }
-
-    fun getCurrentUser(): FirebaseUser? {
-        return auth.currentUser
     }
 
     private fun checkAuthStatus() {

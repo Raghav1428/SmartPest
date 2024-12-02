@@ -1,4 +1,4 @@
-package com.example.smartpest.database
+package com.example.smartpest.database.user
 
 data class UserState(
     val id: Int = 1,

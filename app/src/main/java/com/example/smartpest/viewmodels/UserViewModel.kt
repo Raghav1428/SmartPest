@@ -2,10 +2,10 @@ package com.example.smartpest.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.smartpest.database.User
-import com.example.smartpest.database.UserDao
-import com.example.smartpest.database.UserEvent
-import com.example.smartpest.database.UserState
+import com.example.smartpest.database.user.User
+import com.example.smartpest.database.user.UserDao
+import com.example.smartpest.database.user.UserEvent
+import com.example.smartpest.database.user.UserState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

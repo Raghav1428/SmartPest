@@ -1,4 +1,4 @@
-package com.example.smartpest.database
+package com.example.smartpest.database.user
 
 import androidx.room.Dao
 import androidx.room.Query

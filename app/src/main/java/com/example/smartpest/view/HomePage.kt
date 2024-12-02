@@ -25,29 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomePage(navController: NavHostController) {
-//    val cardItems = listOf(
-//        CardItem("PestDisease AI", R.drawable.finalaidetector),
-//        CardItem("Expert Support", R.drawable.finalexpertsupport),
-//        CardItem("Weather Report", R.drawable.finalweatherreport),
-//        CardItem("Farm Guide", R.drawable.finalfarmguide),
-//        CardItem("Nearby Shops", R.drawable.finalnearbystores),
-//        CardItem("Local Alerts", R.drawable.finallocalalert)
-//    )
-//
-//    LazyColumn(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(16.dp)
-//    ) {
-//        items(cardItems) { item ->
-//            ClickableCard(
-//                navController = navController,
-//                title = item.title,
-//                imageResource = item.imageResource
-//            )
-//        }
-//    }
+
 }
 
 @Composable

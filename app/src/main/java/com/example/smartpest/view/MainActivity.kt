@@ -59,8 +59,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.smartpest.R
-import com.example.smartpest.database.AlertDao
-import com.example.smartpest.database.AppDatabase
 import com.example.smartpest.database.DatabaseProvider
 import com.example.smartpest.models.LoaderIntro
 import com.example.smartpest.models.OnboardingData
@@ -81,7 +79,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private lateinit var userViewModel: UserViewModel
-//    private lateinit var alertViewModel: AlertViewModel
+    private lateinit var alertViewModel: AlertViewModel
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -99,22 +97,23 @@ class MainActivity : ComponentActivity() {
         val database = DatabaseProvider.getDatabase(this)
         val userViewModelFactory = DatabaseProvider.UserViewModelFactory(database.userDao)
         userViewModel = ViewModelProvider(this, userViewModelFactory)[UserViewModel::class.java]
-//        val alertViewModelFactory = DatabaseProvider.AlertViewModelFactory(database.alertDao)
-//        alertViewModel = ViewModelProvider(this, alertViewModelFactory)[AlertViewModel::class.java]
+        val alertViewModelFactory = DatabaseProvider.AlertViewModelFactory(database.alertDao)
+        alertViewModel = ViewModelProvider(this, alertViewModelFactory)[AlertViewModel::class.java]
 
         setContent {
             val themeViewModel: ThemeViewModel = viewModel()
 
             SmartPestTheme(isDarkTheme = themeViewModel.isDarkTheme) {
-                MyApp(themeViewModel, userViewModel)
+                MyApp(themeViewModel, userViewModel, alertViewModel)
             }
         }
     }
 }
+
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
-fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
+fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel, alertViewModel: AlertViewModel) {
 
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
@@ -201,7 +200,7 @@ fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel) {
                         WeatherReport(weatherViewModel)
                     }
                     composable("Local Alerts") {
-                        LocalAlerts(navController)
+                        LocalAlerts(navController, alertViewModel)
                     }
                     composable("Nearby Shops") {
                         NearbyShops(navController)

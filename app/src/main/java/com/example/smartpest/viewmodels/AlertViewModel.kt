@@ -1,45 +1,26 @@
 package com.example.smartpest.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.smartpest.database.Alert
-import com.example.smartpest.database.AlertDao
-import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.flow.Flow
+import com.example.smartpest.database.alert.Alert
+import com.example.smartpest.database.alert.AlertDao
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class AlertViewModel(private val alertDao: AlertDao): ViewModel() {
 
-    val allAlerts: Flow<List<Alert>> = alertDao.getAllAlerts()
-
-    // Function to handle Firebase Remote Message and save to database
-    fun handleRemoteMessage(remoteMessage: RemoteMessage) {
-        viewModelScope.launch {
-            // Extract title and message from the remote message
-            val title = remoteMessage.notification?.title ?: "SmartPest Notification"
-            val message = remoteMessage.notification?.body ?: "You have a new update"
-
-            // Create and insert the alert
-            val alert = Alert(
-                title = title,
-                message = message,
-                timestamp = System.currentTimeMillis()
-            )
-            alertDao.insertAlert(alert)
-        }
-    }
+    val allAlerts: LiveData<List<Alert>> = alertDao.getAllAlerts()
 
     fun deleteAlert(alertId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             alertDao.deleteAlert(alertId)
         }
     }
 
-    fun clearOldAlerts() {
+    fun deleteOldAlerts(thresholdTime: Long) {
         viewModelScope.launch {
-            val oneWeekAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(15)
-            alertDao.deleteOldAlerts(oneWeekAgo)
+            alertDao.deleteOldAlerts(thresholdTime)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.smartpest.database
+package com.example.smartpest.database.user
 
 sealed interface UserEvent {
     object SaveUser: UserEvent

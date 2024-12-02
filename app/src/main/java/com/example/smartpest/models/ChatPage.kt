@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -40,7 +39,6 @@ import com.example.smartpest.ui.theme.userMessage
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import com.example.smartpest.viewmodels.ChatViewModel
-import com.example.smartpest.viewmodels.MessageModel
 
 @Composable
 fun ChatPage(modifier: Modifier = Modifier, viewModel: ChatViewModel) {

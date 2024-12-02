@@ -4,11 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.smartpest.database.alert.Alert
+import com.example.smartpest.database.alert.AlertDao
+import com.example.smartpest.database.user.User
+import com.example.smartpest.database.user.UserDao
 
-@Database(entities = [User::class], version = 1, exportSchema = false)
+@Database(entities = [User::class, Alert::class], version = 1, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract val userDao: UserDao
+    abstract val alertDao: AlertDao
 
     companion object {
         @Volatile

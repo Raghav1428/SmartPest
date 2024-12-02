@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.smartpest.database.UserEvent
+import com.example.smartpest.database.user.UserEvent
 import com.example.smartpest.viewmodels.AuthState
 import com.example.smartpest.viewmodels.AuthViewModel
 import com.example.smartpest.viewmodels.UserViewModel

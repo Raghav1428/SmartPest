@@ -1,4 +1,4 @@
-package com.example.smartpest.viewmodels
+package com.example.smartpest.models
 
 data class MessageModel(
     val message: String,
