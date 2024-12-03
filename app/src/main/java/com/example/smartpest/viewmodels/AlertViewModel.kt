@@ -18,9 +18,10 @@ class AlertViewModel(private val alertDao: AlertDao): ViewModel() {
         }
     }
 
-    fun deleteOldAlerts(thresholdTime: Long) {
-        viewModelScope.launch {
-            alertDao.deleteOldAlerts(thresholdTime)
+    fun deleteOldAlerts() {
+        val fifteenDaysAgo = System.currentTimeMillis() - (15L * 24 * 60 * 60 * 1000)
+        viewModelScope.launch(Dispatchers.IO) {
+            alertDao.deleteOldAlerts(fifteenDaysAgo)
         }
     }
 
