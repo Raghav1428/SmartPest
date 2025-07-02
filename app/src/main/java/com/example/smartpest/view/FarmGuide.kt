@@ -1,6 +1,7 @@
 package com.example.smartpest.view
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,12 @@ import androidx.navigation.NavHostController
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FarmGuide(navController: NavHostController) {
+
+    BackHandler {
+        navController.navigate("Home") {
+            popUpTo("Home") { inclusive = true }
+        }
+    }
 
     Column(
         modifier = Modifier

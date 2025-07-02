@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -48,6 +49,12 @@ fun PestDiseaseAI(navController: NavHostController) {
             }
         }
     )
+
+    BackHandler {
+        navController.navigate("Home") {
+            popUpTo("Home") { inclusive = true }
+        }
+    }
 
     Scaffold(
     ) {

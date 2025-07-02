@@ -20,28 +20,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.outlined.Chat
-import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Book
-import androidx.compose.material.icons.outlined.Camera
-import androidx.compose.material.icons.outlined.Cloud
-import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -113,18 +100,19 @@ class MainActivity : ComponentActivity() {
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
-fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel, alertViewModel: AlertViewModel) {
+fun MyApp(
+    themeViewModel: ThemeViewModel,
+    userViewModel: UserViewModel,
+    alertViewModel: AlertViewModel
+) {
 
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val weatherViewModel: WeatherViewModel = viewModel()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
     val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
 
-    // List of routes where drawer and bottom nav bar should appear
     val mainRoutes = listOf(
         "Home",
         "PestDisease.AI",
@@ -141,189 +129,119 @@ fun MyApp(themeViewModel: ThemeViewModel, userViewModel: UserViewModel, alertVie
         else if (authViewModel.authState.value is AuthState.Authenticated) "home" else "login"
     }
 
-    SmartPestTheme(isDarkTheme = themeViewModel.isDarkTheme) {
-        ModalNavigationDrawer(
-            drawerContent = {
-                if (currentRoute in mainRoutes) {
-                    DrawerContent(navController, authViewModel, themeViewModel, drawerState)
-                }
-            },
-            drawerState = drawerState
-        ) {
-            Scaffold(
-                topBar = {
-                    if (currentRoute in mainRoutes) {
-                        TopAppBar(
-                            title = { Text(currentRoute.toString()) },
-                            navigationIcon = {
-                                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                    Icon(Icons.Default.Menu, contentDescription = "Menu")
-                                }
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
-                        )
-                    }
-                },
-            ) { innerPadding ->
-                NavHost(
-                    navController = navController,
-                    startDestination = startDestination,
-                    Modifier.padding(innerPadding)
-                ) {
-                    composable("onboarding") {
-                        MainOnBoardingFunction(
-                            navController,
-                            onGetStartedClicked = {
-                                prefs.edit().putBoolean("isFirstLaunch", false).apply()
-                                navController.navigate("login") {
-                                    popUpTo("onboarding") { inclusive = true }
-                                }
-                            }
-                        )
-                    }
-                    composable("login") {
-                        LoginPage(navController, authViewModel)
-                    }
-                    composable("signup") {
-                        SignUpPage(navController, authViewModel)
-                    }
-                    composable("Home") {
-                        HomePage(navController)
-                    }
-                    composable("PestDisease.AI") {
-                        PestDiseaseAI(navController)
-                    }
-                    composable("AI Assistant") {
-                        ExpertSupport(navController)
-                    }
-                    composable("Weather Report") {
-                        WeatherReport(weatherViewModel)
-                    }
-                    composable("Local Alerts") {
-                        LocalAlerts(navController, alertViewModel)
-                    }
-                    composable("Nearby Shops") {
-                        NearbyShops(navController)
-                    }
-                    composable("Farm Guide") {
-                        FarmGuide(navController)
-                    }
-                    composable("Profile Page") {
-                        ProfilePage(authViewModel, userViewModel)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DrawerContent(
-    navController: NavHostController,
-    authViewModel: AuthViewModel,
-    themeViewModel: ThemeViewModel,
-    drawerState: DrawerState
-) {
-    val scope = rememberCoroutineScope()
     val items = listOf(
-
-        NavigationItem(
-            "Home",
-            Icons.Filled.Home,
-            Icons.Outlined.Home,
+        BottomNavigationItem(
+            title = "Home",
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Outlined.Home,
             route = "Home"
         ),
-        NavigationItem(
-            "PestDisease.AI",
-            Icons.Filled.Camera,
-            Icons.Outlined.Camera,
-            route = "PestDisease.AI"
-        ),
-        NavigationItem(
-            "AI Assistant",
-            Icons.AutoMirrored.Filled.Chat,
-            Icons.AutoMirrored.Outlined.Chat,
+        BottomNavigationItem(
+            title = "AI Assistant",
+            selectedIcon = Icons.AutoMirrored.Filled.Chat,
+            unselectedIcon = Icons.AutoMirrored.Outlined.Chat,
             route = "AI Assistant"
         ),
-        NavigationItem(
-            "Weather Report",
-            Icons.Filled.Cloud,
-            Icons.Outlined.Cloud,
-            route = "Weather Report"
+        BottomNavigationItem(
+            title = "Guide",
+            selectedIcon = Icons.Filled.Book,
+            unselectedIcon = Icons.Outlined.Book,
+            route = "Farm Guide"
         ),
-        NavigationItem(
-            "Nearby Shops",
-            Icons.Filled.ShoppingCart,
-            Icons.Outlined.ShoppingCart,
-            route = "Nearby Shops"
-        ),
-        NavigationItem("Guide", Icons.Filled.Book, Icons.Outlined.Book, route = "Farm Guide"),
-        NavigationItem(
-            "Local Alerts",
-            Icons.Filled.Notifications,
-            Icons.Outlined.Notifications,
-            route = "Local Alerts"
-        ),
-        NavigationItem(
-            "Profile",
-            Icons.Filled.AccountCircle,
-            Icons.Outlined.AccountCircle,
+        BottomNavigationItem(
+            title = "Profile",
+            selectedIcon = Icons.Filled.AccountCircle,
+            unselectedIcon = Icons.Outlined.AccountCircle,
             route = "Profile Page"
-        ),
-        NavigationItem(
-            "Log Out",
-            Icons.AutoMirrored.Filled.ExitToApp,
-            Icons.AutoMirrored.Outlined.ExitToApp,
-            route = "login"
         )
     )
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        ModalDrawerSheet {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            items.forEachIndexed { index, item ->
-                NavigationDrawerItem(
-                    label = { Text(item.title) },
-                    selected = index == selectedItemIndex,
-                    onClick = {
-                        if (item.title == "Log Out") {
-                            authViewModel.signout()
+    SmartPestTheme(isDarkTheme = themeViewModel.isDarkTheme) {
+        Scaffold(
+            topBar = {
+                if (currentRoute in mainRoutes) {
+                    TopAppBar(
+                        title = { Text(currentRoute.toString()) },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+                    )
+                }
+            },
+            bottomBar = {
+                if (currentRoute in mainRoutes) {
+                    NavigationBar {
+                        items.forEachIndexed { index, item ->
+                            NavigationBarItem(
+                                selected = currentRoute == item.route,
+                                onClick = { navController.navigate(item.route) },
+                                label = {
+                                    Text(item.title)
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = if (currentRoute == item.route) item.selectedIcon else item.unselectedIcon,
+                                        contentDescription = item.title
+                                    )
+                                }
+                            )
                         }
-                        navController.navigate(item.route) {
-                            popUpTo("home") { inclusive = true }
-                        }
-                        selectedItemIndex = index
-                        scope.launch { drawerState.close() }
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
-                            contentDescription = item.title
-                        )
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(
-                onClick = { themeViewModel.toggleTheme() },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(16.dp)
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                Modifier.padding(innerPadding)
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.DarkMode,
-                    contentDescription = "Toggle Dark Mode",
-                    tint = if (themeViewModel.isDarkTheme) Color.White else Gray
-                )
+                composable("onboarding") {
+                    MainOnBoardingFunction(
+                        navController,
+                        onGetStartedClicked = {
+                            prefs.edit().putBoolean("isFirstLaunch", false).apply()
+                            navController.navigate("login") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
+                        }
+                    )
+                }
+                composable("login") {
+                    LoginPage(navController, authViewModel)
+                }
+                composable("signup") {
+                    SignUpPage(navController, authViewModel)
+                }
+                composable("Home") {
+                    HomePage(navController, userViewModel, weatherViewModel, alertViewModel)
+                }
+                composable("PestDisease.AI") {
+                    PestDiseaseAI(navController)
+                }
+                composable("AI Assistant") {
+                    ExpertSupport(navController)
+                }
+                composable("Weather Report") {
+                    WeatherReport(navController, weatherViewModel)
+                }
+                composable("Local Alerts") {
+                    LocalAlerts(navController, alertViewModel)
+                }
+                composable("Farm Guide") {
+                    FarmGuide(navController)
+                }
+                composable("Profile Page") {
+                    ProfilePage(navController,authViewModel, userViewModel, themeViewModel)
+                }
             }
         }
     }
 }
+
+data class BottomNavigationItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
+    val route: String
+)
 
 @Composable
 fun SmartPestTheme(isDarkTheme: Boolean, content: @Composable () -> Unit) {
@@ -334,14 +252,6 @@ fun SmartPestTheme(isDarkTheme: Boolean, content: @Composable () -> Unit) {
         content = content
     )
 }
-
-data class NavigationItem(
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val hasNews: Boolean = false,
-    val route: String
-)
 
 @ExperimentalPagerApi
 @Composable
@@ -477,7 +387,10 @@ fun PagerIndicator(
 @Composable
 fun Indicator(isSelected: Boolean) {
 
-    val width = animateDpAsState(targetValue = if (isSelected) 25.dp else 10.dp, label = "Onboarding Indicator")
+    val width = animateDpAsState(
+        targetValue = if (isSelected) 25.dp else 10.dp,
+        label = "Onboarding Indicator"
+    )
 
     Box(
         modifier = Modifier

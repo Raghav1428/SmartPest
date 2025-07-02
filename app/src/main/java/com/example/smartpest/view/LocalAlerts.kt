@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,12 @@ fun LocalAlerts(navController: NavHostController, alertViewModel: AlertViewModel
         }
     )
     val alerts = alertViewModel.allAlerts.observeAsState().value ?: emptyList()
+
+    BackHandler {
+        navController.navigate("Home") {
+            popUpTo("Home") { inclusive = true }
+        }
+    }
 
     Scaffold {
 

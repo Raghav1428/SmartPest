@@ -1,5 +1,6 @@
 package com.example.smartpest.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartpest.database.user.User
@@ -20,6 +21,11 @@ class UserViewModel(private val userDao: UserDao): ViewModel() {
         loadUser()
     }
 
+    fun isProfileComplete(): Boolean {
+        return state.value.name.trim().isNotBlank() &&
+                state.value.location.trim().isNotBlank() &&
+                state.value.phone.trim().isNotBlank()
+    }
     private fun loadUser() {
         viewModelScope.launch {
             try {
@@ -35,8 +41,7 @@ class UserViewModel(private val userDao: UserDao): ViewModel() {
                     }
                 }
             } catch (e: Exception) {
-                // Handle error if needed
-                // You might want to add error handling state
+                Log.e("UserViewModel", e.printStackTrace().toString())
             }
         }
     }

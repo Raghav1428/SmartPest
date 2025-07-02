@@ -33,12 +33,12 @@ class WeatherViewModel : ViewModel() {
                 } else {
                     _weatherResult.value = NetworkResponse.Error("Failed to load data: ${response.message()}")
                 }
-            } catch (e: Exception) {
-                _weatherResult.value = NetworkResponse.Error("Failed to load data: ${e.message}")
             } catch (e: HttpException) {
                 _weatherResult.value = NetworkResponse.Error("HTTP Exception: ${e.message}")
             } catch (e: IOException) {
                 _weatherResult.value = NetworkResponse.Error("IO Exception: ${e.message}")
+            } catch (e: Exception) {
+                _weatherResult.value = NetworkResponse.Error("Failed to load data: ${e.message}")
             }
         }
     }

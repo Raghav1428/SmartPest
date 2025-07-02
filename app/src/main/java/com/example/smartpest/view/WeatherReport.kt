@@ -1,6 +1,7 @@
 package com.example.smartpest.view
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.smartpest.weatherapi.NetworkResponse
 import com.example.smartpest.weatherapi.WeatherModel
@@ -42,7 +44,7 @@ import com.example.smartpest.viewmodels.WeatherViewModel
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun WeatherReport(viewModel: WeatherViewModel) {
+fun WeatherReport(navController: NavController, viewModel: WeatherViewModel) {
 
     var city by remember {
         mutableStateOf("")
@@ -51,6 +53,12 @@ fun WeatherReport(viewModel: WeatherViewModel) {
     val weatherResult = viewModel.weatherResult.observeAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    BackHandler {
+        navController.navigate("Home") {
+            popUpTo("Home") { inclusive = true }
+        }
+    }
 
     Column(
         modifier = Modifier

@@ -30,7 +30,6 @@ import com.example.smartpest.viewmodels.AuthState
 import com.example.smartpest.viewmodels.AuthViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginPage(navController: NavHostController, authViewModel: AuthViewModel) {
 
@@ -44,31 +43,28 @@ fun LoginPage(navController: NavHostController, authViewModel: AuthViewModel) {
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(authState) {
-        when(authState) {
+        when (authState) {
             is AuthState.Authenticated -> {
                 navController.navigate("home")
             }
+
             is AuthState.PasswordResetEmailSent -> {
                 Toast.makeText(context, "Password reset email sent", Toast.LENGTH_SHORT).show()
             }
+
             is AuthState.Unauthenticated -> {
                 Toast.makeText(context, "Authentication failed", Toast.LENGTH_SHORT).show()
             }
+
             else -> Unit
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Welcome") }
-            )
-        }
-    ) {
+    Scaffold() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .padding(10.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -80,7 +76,7 @@ fun LoginPage(navController: NavHostController, authViewModel: AuthViewModel) {
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(150.dp))
+            Spacer(modifier = Modifier.height(100.dp))
 
             OutlinedTextField(
                 value = email,
@@ -110,11 +106,12 @@ fun LoginPage(navController: NavHostController, authViewModel: AuthViewModel) {
                 )
             )
 
-            TextButton(modifier = Modifier.align(Alignment.End)
+            TextButton(modifier = Modifier
+                .align(Alignment.End)
                 .padding(end = 55.dp),
                 onClick = {
-                showForgotPasswordDialog = true
-            }) {
+                    showForgotPasswordDialog = true
+                }) {
                 Text("Forgot password?")
             }
 
@@ -182,7 +179,7 @@ fun PasswordField(
                 )
             }
         },
-        visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation() ,
+        visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
     )
