@@ -1,459 +1,141 @@
 package com.example.smartpest.view
 
-import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RawRes
-import androidx.annotation.RequiresExtension
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Button
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.ModalBottomSheetLayout
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.ModalBottomSheetValue
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.CenterFocusStrong
+import androidx.compose.material.icons.outlined.CloudQueue
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
+import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.smartpest.R
-import com.example.smartpest.database.alert.Alert
+import com.example.smartpest.BuildConfig
+import com.example.smartpest.ui.components.LeafIllustration
+import com.example.smartpest.ui.components.SectionLabel
 import com.example.smartpest.viewmodels.AlertViewModel
 import com.example.smartpest.viewmodels.UserViewModel
 import com.example.smartpest.viewmodels.WeatherViewModel
 import com.example.smartpest.weatherapi.NetworkResponse
-import kotlinx.coroutines.launch
 import java.time.LocalTime
 
-@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomePage(
-    navController: NavHostController,
-    userViewModel: UserViewModel,
-    weatherViewModel: WeatherViewModel,
-    alertViewModel: AlertViewModel
-) {
-    val currentHour = LocalTime.now().hour
-    val greeting = when (currentHour) {
-        in 4..11 -> "Good Morning"
-        in 12..17 -> "Good Afternoon"
-        else -> "Good Evening"
-    }
-    val userState = userViewModel.state.collectAsState().value
-    val weatherState by weatherViewModel.weatherResult.observeAsState()
+fun HomePage(navController: NavHostController, userViewModel: UserViewModel,
+             weatherViewModel: WeatherViewModel, alertViewModel: AlertViewModel) {
+    val user by userViewModel.state.collectAsState()
+    val weather by weatherViewModel.weatherResult.observeAsState()
     val alerts by alertViewModel.allAlerts.observeAsState(emptyList())
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val scope = rememberCoroutineScope()
-    val isProfileComplete = remember(userState) {
-        userViewModel.isProfileComplete()
+    LaunchedEffect(user.location) {
+        if (user.location.isNotBlank() && BuildConfig.WEATHER_API_KEY.isNotBlank()) weatherViewModel.getData(user.location)
     }
-    var showProfilePrompt by remember {
-        mutableStateOf(!isProfileComplete)
+    val greeting = when (LocalTime.now().hour) {
+        in 4..11 -> "Good morning"
+        in 12..17 -> "Good afternoon"
+        else -> "Good evening"
     }
-
-    LaunchedEffect(userState.location, isProfileComplete) {
-        if (isProfileComplete) {
-            weatherViewModel.getData(userState.location)
-            showProfilePrompt = false
-        }
-    }
-
-    if (showProfilePrompt) {
-        LaunchedEffect(Unit) {
-            scope.launch {
-                sheetState.show()
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        LazyColumn(Modifier.widthIn(max = 720.dp).fillMaxSize(), contentPadding = PaddingValues(24.dp),
+            verticalArrangement = Arrangement.spacedBy(26.dp)) {
+            item {
+                SectionLabel(if (user.name.isBlank()) greeting else "$greeting, ${user.name.trim()}")
+                Spacer(Modifier.height(10.dp))
+                Text("A closer look at your tomatoes.", style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(10.dp))
+                Text("Understand leaf symptoms. Take the next step with care.", style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-        }
-    }
-
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetContent = {
-            Column(
-                modifier = Modifier.padding(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Profile Incomplete", style = MaterialTheme.typography.headlineMedium)
-                Text(
-                    "Your profile details are incomplete. Please update your profile for better functionality.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = {
-                        navController.navigate("Profile Page")
-                        scope.launch { sheetState.hide() }
-                        showProfilePrompt = false
-                    }
-                ) {
-                    Text("Complete Now")
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                TextButton(
-                    onClick = {
-                        scope.launch { sheetState.hide() }
-                        showProfilePrompt = false
-                    }
-                ) {
-                    Text("Later")
-                }
-            }
-        }
-    ) {
-        Scaffold { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                item {
-                    Text(
-                        text = "$greeting, ${userState.name}",
-                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-
-                item {
-                    when (val result = weatherState) {
-                        is NetworkResponse.Loading -> {
-                            WeatherLoadingPlaceholder()
-                        }
-                        is NetworkResponse.Success -> {
-                            result.data.let { weatherModel ->
-                                WeatherWidget(
-                                    weatherData = WeatherData(
-                                        location = weatherModel.location.name,
-                                        date = weatherModel.current.last_updated.split(" ")[0],
-                                        temperature = "${weatherModel.current.temp_c}°C",
-                                        condition = weatherModel.current.condition.text,
-                                        conditionIcon = "https:${weatherModel.current.condition.icon}",
-                                        precipitation = "${weatherModel.current.precip_mm}mm",
-                                        gust = "${weatherModel.current.gust_kph}km/hr"
-                                    ),
-                                    onClick = { navController.navigate("Weather Report") }
-                                )
+            item {
+                Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(24.dp)) {
+                    Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                SectionLabel("START WITH A LEAF")
+                                Text("Spot a change?", style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer)
+                                Text("Check a tomato leaf photo against the model's supported conditions.", style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer)
                             }
+                            LeafIllustration(Modifier.size(86.dp))
                         }
-                        is NetworkResponse.Error -> {
-                            WeatherErrorPlaceholder(result.message)
+                        Button(onClick = { navController.navigate(AppRoutes.SCAN) { launchSingleTop = true } },
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) {
+                            Icon(Icons.Outlined.CenterFocusStrong, null, Modifier.size(20.dp))
+                            Spacer(Modifier.width(10.dp))
+                            Text("Scan a tomato leaf")
                         }
-                        null -> {
-                            WeatherUnavailablePlaceholder()
-                        }
+                        Text("On-device analysis · Photos aren't uploaded for scanning", style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
-
-                item {
-                    LocalAlertsWidget(
-                        topAlert = alerts.firstOrNull(),
-                        onClick = { navController.navigate("Local Alerts") }
-                    )
+            }
+            item {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text("Know the signs", style = MaterialTheme.typography.titleLarge)
+                    TextButton(onClick = { navController.navigate(AppRoutes.GUIDE) { launchSingleTop = true } }) { Text("View guide") }
                 }
-
-                item {
-                    DiseaseScanWidget(
-                        lottieResId = R.raw.plantscan,
-                        onClick = { navController.navigate("PestDisease.AI") }
-                    )
+                Text("Explore 8 diseases, mite damage and the healthy-leaf category. Compare symptoms before deciding what to do.",
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(12.dp))
+                HomeLink(Icons.AutoMirrored.Outlined.MenuBook, "Your tomato field notes", "Symptoms, prevention and practical care",
+                    onClick = { navController.navigate(AppRoutes.GUIDE) { launchSingleTop = true } })
+            }
+            item {
+                SectionLabel("A SMALL HABIT THAT HELPS")
+                Spacer(Modifier.height(12.dp))
+                Text("Water the roots. Keep leaves dry.", style = MaterialTheme.typography.headlineSmall)
+                Spacer(Modifier.height(8.dp))
+                Text("Water at soil level and give plants room for airflow. Wet foliage and splashing soil can help several tomato diseases spread.",
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            item {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Spacer(Modifier.height(22.dp))
+                Text("Around your patch", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(14.dp))
+                val success = weather as? NetworkResponse.Success
+                val weatherSummary = when {
+                    user.location.isBlank() -> "Add your location in Profile"
+                    BuildConfig.WEATHER_API_KEY.isBlank() -> "Weather service isn't configured"
+                    weather is NetworkResponse.Loading -> "Loading local weather…"
+                    success != null -> "${success.data.current.temp_c}°C · ${success.data.current.condition.text}"
+                    weather is NetworkResponse.Error -> "Weather unavailable · Search a location"
+                    else -> "View conditions for your growing area"
                 }
+                HomeLink(Icons.Outlined.CloudQueue, "Growing weather", weatherSummary) {
+                    navController.navigate(if (user.location.isBlank()) AppRoutes.PROFILE else AppRoutes.WEATHER) { launchSingleTop = true }
+                }
+                Spacer(Modifier.height(10.dp))
+                HomeLink(Icons.Outlined.NotificationsNone, "Local notices",
+                    if (alerts.isEmpty()) "No notices saved · General local advisories" else "${alerts.size} saved · General local advisories") {
+                    navController.navigate(AppRoutes.ALERTS) { launchSingleTop = true }
+                }
+            }
+            item {
+                Text("A leaf photo is a starting point, not a confirmed diagnosis. Consult a plant clinic when symptoms persist or spread.",
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
 }
 
 @Composable
-fun WeatherLoadingPlaceholder() {
-    val roundedCornerShape = RoundedCornerShape(30.dp)
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .border(2.dp, Color.Gray, roundedCornerShape),
-        shape = roundedCornerShape,
-        tonalElevation = 1.dp
-    ) {
-        Text(
-            text = "Loading weather...",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-
-@Composable
-fun WeatherErrorPlaceholder(message: String?) {
-    val roundedCornerShape = RoundedCornerShape(30.dp)
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .border(2.dp, Color.Gray, roundedCornerShape),
-        shape = roundedCornerShape,
-        tonalElevation = 1.dp
-    ) {
-        Text(
-            text = "Error: $message",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-
-@Composable
-fun WeatherUnavailablePlaceholder() {
-    val roundedCornerShape = RoundedCornerShape(30.dp)
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .border(2.dp, Color.Gray, roundedCornerShape),
-        shape = roundedCornerShape,
-        tonalElevation = 1.dp
-    ) {
-        Text(
-            text = "No weather available",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-
-
-@Composable
-fun WeatherWidget(weatherData: WeatherData, onClick: () -> Unit) {
-    val roundedCornerShape = RoundedCornerShape(30.dp)
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() }
-            .border(2.dp, Color.Gray, roundedCornerShape),
-        shape = roundedCornerShape,
-        tonalElevation = 1.dp,
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(
-                        text = "${weatherData.location}, ${weatherData.date}",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = weatherData.condition,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = weatherData.gust,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = weatherData.precipitation,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+private fun HomeLink(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+    Surface(onClick = onClick, color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(16.dp)) {
+        Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-
-            Spacer(modifier = Modifier.width(22.dp))
-            Text(
-                text = weatherData.temperature,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.width(4.dp))
-            Image(
-                painter = rememberAsyncImagePainter(model = weatherData.conditionIcon),
-                contentDescription = "Weather Condition Icon",
-                modifier = Modifier.size(72.dp)
-            )
-        }
-    }
-}
-
-data class WeatherData(
-    val location: String,
-    val date: String,
-    val temperature: String,
-    val condition: String,
-    val conditionIcon: String,
-    val precipitation: String,
-    val gust:  String
-)
-
-@Composable
-fun LocalAlertsWidget(topAlert: Alert?, onClick: () -> Unit) {
-    val roundedCornerShape = RoundedCornerShape(30.dp)
-    if (topAlert != null) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { onClick() }
-                .border(2.dp, Color.Gray, roundedCornerShape),
-            shape = roundedCornerShape,
-            tonalElevation = 1.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(
-                            text = topAlert.title,
-                            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = topAlert.message,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
-    } else {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { onClick() }
-                .border(2.dp, Color.Gray, roundedCornerShape),
-            shape = roundedCornerShape,
-            tonalElevation = 1.dp
-        ) {
-            Text(
-                text = "No alerts available",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun DiseaseScanWidget(
-    @RawRes lottieResId: Int,
-    onClick: () -> Unit
-) {
-    val roundedCornerShape = RoundedCornerShape(30.dp)
-
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(lottieResId)
-    )
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() }
-            .border(2.dp, Color.Gray, roundedCornerShape),
-        shape = roundedCornerShape,
-        tonalElevation = 1.dp
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            LottieAnimation(
-                composition = composition,
-                iterations = LottieConstants.IterateForever,
-                modifier = Modifier
-                    .size(200.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Farmer.AI",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Quick disease identification for your crops",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Icon(Icons.AutoMirrored.Outlined.ArrowForward, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
         }
     }
 }

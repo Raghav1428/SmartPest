@@ -1,164 +1,103 @@
 package com.example.smartpest.models
 
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.smartpest.ui.components.SectionLabel
+import com.example.smartpest.ui.components.TomatoMark
 import com.example.smartpest.viewmodels.ChatViewModel
 
 @Composable
 fun ChatPage(modifier: Modifier = Modifier, viewModel: ChatViewModel) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .windowInsetsPadding(
-                WindowInsets.safeDrawing.only(
-                    WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-                )
-            )
-    ) {
-        MessageList(
-            modifier = Modifier
-                .weight(1f),
-            messageList = viewModel.messageList
-        )
-        MessageInput(onMessageSend = {
-            viewModel.sendMessage(it)
-        }
-        )
+    val scroll = rememberLazyListState()
+    LaunchedEffect(viewModel.messageList.size, viewModel.isSending) {
+        val last = viewModel.messageList.size - 1 + if (viewModel.isSending) 1 else 0
+        if (last >= 0) scroll.animateScrollToItem(last)
     }
-}
-
-@Composable
-fun MessageInput(onMessageSend: (String) -> Unit) {
-
-    var message by remember {
-        mutableStateOf("")
-    }
-
-    Row(
-        modifier = Modifier
-            .padding(8.dp)
-            .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(24.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(
-            value = message,
-            onValueChange = { message = it },
-            placeholder = {
-                Text("Type a message...", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
-            keyboardActions = KeyboardActions(onSend = {
-                if (message.isNotEmpty()) {
-                    onMessageSend(message)
-                    message = ""
+    Column(modifier.fillMaxSize().imePadding()) {
+        if (viewModel.messageList.isEmpty()) {
+            LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                item {
+                    TomatoMark(Modifier.size(46.dp))
+                    Spacer(Modifier.height(20.dp))
+                    SectionLabel("A LITTLE TOMATO KNOW-HOW")
+                    Spacer(Modifier.height(10.dp))
+                    Text("Let's talk tomatoes.", style = MaterialTheme.typography.headlineLarge)
+                    Spacer(Modifier.height(12.dp))
+                    Text("Ask about leaf symptoms, watering or prevention. For a photo screening result, use the Scan tab.",
+                        style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-            })
-        )
-
-        IconButton(onClick = {
-            if (message.isNotEmpty()) {
-                onMessageSend(message)
-                message = ""
+                items(listOf("What do concentric brown leaf spots mean?", "How can I keep tomato leaves dry?", "How do I check for spider mites?")) { question ->
+                    OutlinedButton(onClick = { viewModel.sendMessage(question) }, modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
+                        Text(question, Modifier.padding(vertical = 8.dp))
+                    }
+                }
+                item { Text("Educational guidance, not a confirmed diagnosis. Replies are generated online and can be wrong. Your typed messages are sent to Google's AI service.",
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
-        }) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
-                contentDescription = "Send",
-                tint = MaterialTheme.colorScheme.primary
-            )
+        } else {
+            LazyColumn(Modifier.weight(1f), state = scroll, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                items(viewModel.messageList) { MessageBubble(it) }
+                if (viewModel.isSending) item {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                        Text("Preparing tomato care guidance…", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
         }
+        viewModel.errorMessage?.let {
+            Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                Text(it, Modifier.padding(16.dp), style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        MessageInput(enabled = !viewModel.isSending, onMessageSend = viewModel::sendMessage)
     }
 }
 
 @Composable
-fun MessageList(modifier: Modifier = Modifier, messageList: List<MessageModel>) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp),
-        reverseLayout = true
-    ) {
-        items(messageList.reversed()) { message ->
-            MessageBubble(messageModel = message)
+fun MessageInput(onMessageSend: (String) -> Unit, enabled: Boolean = true) {
+    var message by rememberSaveable { mutableStateOf("") }
+    val send = {
+        if (message.isNotBlank() && enabled) {
+            onMessageSend(message.trim())
+            message = ""
+        }
+    }
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(message, { message = it }, modifier = Modifier.weight(1f), enabled = enabled,
+            placeholder = { Text("Ask about your tomatoes…") }, shape = RoundedCornerShape(20.dp), maxLines = 4,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+            keyboardActions = KeyboardActions(onSend = { send() }))
+        FilledIconButton(onClick = send, enabled = enabled && message.isNotBlank(), modifier = Modifier.size(52.dp)) {
+            Icon(Icons.AutoMirrored.Filled.Send, "Send tomato question")
         }
     }
 }
 
 @Composable
 fun MessageBubble(messageModel: MessageModel) {
-    val isModel = messageModel.role == "model"
-    val bubbleColor = if (isModel) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = if (isModel) Arrangement.Start else Arrangement.End
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(bubbleColor)
-                .padding(12.dp)
-        ) {
-            Text(
-                text = messageModel.message,
-                color = if (isModel) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.bodyMedium
-            )
+    val isAssistant = messageModel.role == "model"
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = if (isAssistant) Alignment.Start else Alignment.End) {
+        Text(if (isAssistant) "Tomato assistant" else "You", style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp))
+        Surface(shape = RoundedCornerShape(18.dp), color = if (isAssistant) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primaryContainer) {
+            Text(messageModel.message, Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local release-signing material and generated release outputs
+*.jks
+*.keystore
+/app/release/

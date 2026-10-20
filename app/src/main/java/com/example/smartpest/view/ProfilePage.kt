@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,6 +46,7 @@ fun ProfilePage(navController: NavController, authViewModel: AuthViewModel, user
     var isChanged by remember { mutableStateOf(false) }
 
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
+    var showDataInfo by remember { mutableStateOf(false) }
     val authState by authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
@@ -62,20 +65,19 @@ fun ProfilePage(navController: NavController, authViewModel: AuthViewModel, user
         }
     }
 
-    BackHandler {
-        navController.navigate("Home") {
-            popUpTo("Home") { inclusive = true }
-        }
-    }
-
     Scaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text("Your grower profile", style = MaterialTheme.typography.headlineMedium)
+            Text("Add a location for local weather. Your profile is stored on this device.",
+                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             OutlinedTextField(
                 value = state.name,
                 onValueChange = {
@@ -160,18 +162,24 @@ fun ProfilePage(navController: NavController, authViewModel: AuthViewModel, user
                 Text("Reset Password", color = MaterialTheme.colorScheme.primary)
             }
 
-            val uriHandler = LocalUriHandler.current
-            TextButton(
-                onClick = { uriHandler.openUri("https://www.google.com") }
-            ) {
-                Text("Privacy Policy")
+            TextButton(onClick = { showDataInfo = true }) { Text("Data & privacy") }
+            if (showDataInfo) {
+                AlertDialog(
+                    onDismissRequest = { showDataInfo = false },
+                    title = { Text("About your data") },
+                    text = { Text("Leaf scanning runs on this device; scan photos are not sent to an AI service. Camera photos are cached temporarily. Your profile and saved notices are stored locally. Android backup settings may back up eligible app data.\n\nFirebase handles account authentication and notifications. Typed assistant questions and recent successful conversation turns are sent to Google's AI service. The weather tool sends the location you enter to WeatherAPI. These online services have their own privacy policies.\n\nThe bundled model supports only a limited set of tomato leaf conditions. It can be wrong, even when its confidence is high.") },
+                    confirmButton = { TextButton(onClick = { showDataInfo = false }) { Text("Close") } }
+                )
             }
 
             TextButton(
                 onClick = {
                     authViewModel.signout()
                     Toast.makeText(context, "Signed out", Toast.LENGTH_SHORT).show()
-                    navController.navigate("login")
+                    navController.navigate(AppRoutes.LOGIN) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             ) {
                 Text("Sign Out")
@@ -186,17 +194,11 @@ fun ProfilePage(navController: NavController, authViewModel: AuthViewModel, user
                 )
             }
 
-            IconButton(
-                onClick = { themeViewModel.toggleTheme() },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.DarkMode,
-                    contentDescription = "Toggle Dark Mode",
-                    tint = if (themeViewModel.isDarkTheme) Color.White else Gray
-                )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Dark appearance", style = MaterialTheme.typography.titleSmall)
+                Switch(checked = themeViewModel.isDarkTheme, onCheckedChange = { themeViewModel.toggleTheme() })
             }
         }
     }

@@ -15,7 +15,6 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.farmfix"
         applicationId = "com.example.smartpest"
         minSdk = 28
         targetSdk = 34
@@ -127,8 +126,14 @@ dependencies {
     implementation(libs.coil.compose)//image loading
     implementation("androidx.core:core-ktx:1.10.1")
 
-    implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
-    implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
+    // LiteRT retains the org.tensorflow.lite API and supports modern 16 KB-page devices.
+    // Keep the bundled model unchanged; align support with the modern Tensor interface.
+    implementation(libs.litert)
+    implementation(libs.tensorflow.lite.support) {
+        exclude(group = "org.tensorflow", module = "tensorflow-lite")
+        exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+    }
+    implementation(libs.tensorflow.lite.metadata)
 
     //Onboarding Screen
     implementation("com.google.accompanist:accompanist-pager:0.12.0")
