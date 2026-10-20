@@ -1,184 +1,111 @@
 package com.example.smartpest.view
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun FarmGuide(navController: NavHostController) {
-
-    BackHandler {
-        navController.navigate("Home") {
-            popUpTo("Home") { inclusive = true }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-    ) {
-        // Add padding to the top (e.g., 16.dp) and display the problems list
-        ProblemList(
-            problemsList = listOf(
-                ProblemItem(
-                    "Pest Infestation",
-                    "Use integrated pest management (IPM) techniques and select resistant crop varieties."
-                ),
-                ProblemItem(
-                    "Soil Erosion",
-                    "Implement contour plowing, terracing, and cover crops to reduce soil erosion."
-                ),
-                ProblemItem(
-                    "Water Scarcity",
-                    "Utilize drip irrigation systems, rainwater harvesting, and drought-resistant crops."
-                ),
-                ProblemItem(
-                    "Weed Control",
-                    "Apply mulching, herbicides, or manual weeding to manage weed growth."
-                ),
-                ProblemItem(
-                    "Nutrient Deficiency",
-                    "Perform soil testing and apply the necessary fertilizers based on the test results."
-                ),
-                ProblemItem(
-                    "Crop Diseases",
-                    "Choose disease-resistant varieties and apply appropriate fungicides or crop rotation."
-                ),
-                ProblemItem(
-                    "Climate Change",
-                    "Adapt to climate change by diversifying crops and using climate-smart farming practices."
-                ),
-                ProblemItem(
-                    "Low Yield",
-                    "Enhance soil fertility, adopt modern farming techniques, and use high-yield crop varieties."
-                ),
-                ProblemItem(
-                    "Market Fluctuations",
-                    "Diversify your crops, enter into cooperatives, or sell through contract farming to reduce risk."
-                ),
-                ProblemItem(
-                    "Post-Harvest Losses",
-                    "Use proper storage techniques, timely harvesting, and pest control to minimize losses."
-                ),
-                ProblemItem(
-                    "Salinity in Soil",
-                    "Use salt-tolerant crops and implement improved irrigation management techniques."
-                ),
-                ProblemItem(
-                    "Flooding and Water logging",
-                    "Improve drainage systems, use raised beds, or grow flood-resistant crops."
-                ),
-                ProblemItem(
-                    "Soil Compaction",
-                    "Use deep tillage or subsoiling, and avoid overuse of heavy machinery."
-                ),
-                ProblemItem(
-                    "Crop Frost Damage",
-                    "Use frost protection techniques like irrigation, wind machines, or covering crops."
-                ),
-                ProblemItem(
-                    "Heat Stress on Crops",
-                    "Use shade netting, mulching, and drought-tolerant crop varieties."
-                ),
-                ProblemItem(
-                    "Overuse of Fertilizers",
-                    "Follow soil testing results and apply the appropriate amount of fertilizers."
-                ),
-                ProblemItem(
-                    "Seed Germination Failure",
-                    "Ensure good seed quality, proper moisture levels, and adequate soil temperature."
-                ),
-                ProblemItem(
-                    "Inconsistent Rainfall",
-                    "Implement rainwater harvesting, and adopt water-saving irrigation techniques."
-                ),
-                ProblemItem(
-                    "Invasive Species",
-                    "Use biological control methods, crop rotation, and early detection strategies."
-                )
-            ),
-            modifier = Modifier.padding(top = 16.dp)
-        )
-    }
-}
-
-data class ProblemItem(
-    val problem: String,
-    val solution: String
-)
+import com.example.smartpest.models.TomatoDisease
+import com.example.smartpest.ui.components.CareSteps
+import com.example.smartpest.ui.components.SectionLabel
 
 @Composable
-fun ProblemList(problemsList: List<ProblemItem>, modifier: Modifier = Modifier) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(problemsList) { problemItem ->
-            ExpandableProblemItem(problemItem = problemItem)
+fun FarmGuide(@Suppress("UNUSED_PARAMETER") navController: NavHostController) = TomatoGuideContent()
+
+@Composable
+fun TomatoGuideContent() {
+    var query by rememberSaveable { mutableStateOf("") }
+    var selectedIndex by rememberSaveable { mutableStateOf<Int?>(null) }
+    val selected = TomatoDisease.entries.firstOrNull { it.modelIndex == selectedIndex }
+    BackHandler(enabled = selected != null) { selectedIndex = null }
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        if (selected != null) {
+            key(selected.modelIndex) { TomatoConditionDetail(selected) { selectedIndex = null } }
+        } else {
+            Column(Modifier.widthIn(max = 720.dp).fillMaxSize().padding(horizontal = 24.dp)) {
+                Spacer(Modifier.height(20.dp))
+                SectionLabel("THE TOMATO FIELD GUIDE")
+                Spacer(Modifier.height(10.dp))
+                Text("Know what you're looking at.", style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(10.dp))
+                Text("Eight diseases, one pest-damage category and healthy leaves. Learn the signs; don't diagnose by appearance alone.",
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(18.dp))
+                OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Search conditions or symptoms") }, singleLine = true,
+                    leadingIcon = { Icon(Icons.Outlined.Search, null) }, shape = MaterialTheme.shapes.medium)
+                Spacer(Modifier.height(12.dp))
+                val conditions = remember(query) { TomatoDisease.search(query) }
+                if (conditions.isEmpty()) {
+                    Column(Modifier.fillMaxWidth().padding(vertical = 28.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("No matching tomato conditions", style = MaterialTheme.typography.titleMedium)
+                        Text("Try a condition name or a visible symptom such as yellowing or webbing.", style = MaterialTheme.typography.bodyMedium)
+                        TextButton(onClick = { query = "" }) { Text("Clear search") }
+                    }
+                } else {
+                    Text("${conditions.size} ${if (conditions.size == 1) "condition" else "conditions"}",
+                        style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    LazyColumn(contentPadding = PaddingValues(top = 10.dp, bottom = 24.dp)) {
+                        items(conditions, key = { it.modelIndex }) { disease ->
+                            Surface(onClick = { selectedIndex = disease.modelIndex }, color = MaterialTheme.colorScheme.surface) {
+                                Row(Modifier.fillMaxWidth().padding(vertical = 20.dp), verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                                    Text((disease.modelIndex - 27).toString().padStart(2, '0'),
+                                        style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Text(disease.displayName, style = MaterialTheme.typography.titleMedium)
+                                        Text(disease.category + if (disease.urgent) " · Prompt attention" else "",
+                                            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+                                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun ExpandableProblemItem(problemItem: ProblemItem) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { isExpanded = !isExpanded },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = problemItem.problem,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Collapse" else "Expand",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-
-            if (isExpanded) {
-                Spacer(
-                    modifier = Modifier.height(8.dp),
-                )
-                Text(
-                    text = problemItem.solution,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.W400
-                )
-            }
+private fun TomatoConditionDetail(disease: TomatoDisease, onBack: () -> Unit) {
+    val uriHandler = LocalUriHandler.current
+    Column(Modifier.widthIn(max = 720.dp).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        TextButton(onClick = onBack, contentPadding = PaddingValues(0.dp)) {
+            Icon(Icons.AutoMirrored.Outlined.ArrowBack, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text("All conditions")
+        }
+        SectionLabel(disease.category)
+        Text(disease.displayName, style = MaterialTheme.typography.headlineLarge)
+        Text(disease.summary, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        Text("What to look for", style = MaterialTheme.typography.titleLarge)
+        disease.symptoms.forEach { Text("•  $it", style = MaterialTheme.typography.bodyMedium) }
+        Text("Care & prevention", style = MaterialTheme.typography.titleLarge)
+        CareSteps(disease.actions)
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) {
+            Text("Similar-looking symptoms can have different causes. Confirm with a local plant adviser before treatment. Use only locally registered products and follow the label, protective equipment and harvest intervals.",
+                Modifier.padding(18.dp), style = MaterialTheme.typography.bodySmall)
+        }
+        TextButton(onClick = { uriHandler.openUri(disease.referenceUrl) }, contentPadding = PaddingValues(0.dp)) {
+            Text("Read extension guidance ↗")
         }
     }
 }

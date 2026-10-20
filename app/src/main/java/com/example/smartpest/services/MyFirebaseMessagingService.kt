@@ -38,7 +38,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Check notification payload
         remoteMessage.notification?.let {notification ->
 
-            val title = notification.title ?: "SmartPest Notification"
+            val title = notification.title ?: "TomatoCare notice"
             val message = notification.body ?: "You have a new update"
 
             showNotification(title,message)
@@ -81,8 +81,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun createNotificationChannel() {
-        val channelName = "SmartPest Notifications"
-        val channelDescription = "Notifications for SmartPest app"
+        val channelName = "TomatoCare notices"
+        val channelDescription = "General local advisories for TomatoCare"
         val importance = NotificationManager.IMPORTANCE_HIGH
 
         val channel = NotificationChannel(CHANNEL_ID, channelName, importance).apply {

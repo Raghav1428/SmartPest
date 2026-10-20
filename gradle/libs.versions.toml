@@ -51,8 +51,9 @@ ui = "1.7.2"
 uiVersion = "1.5.0"
 cameraView = "1.3.4"
 litertSupportApi = "1.0.1"
-tensorflowLiteSupport = "0.1.0"
-tensorflowLiteMetadata = "0.1.0"
+tensorflowLiteSupport = "0.4.4"
+tensorflowLiteMetadata = "0.4.4"
+litert = "1.4.0"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.0.0"
 runtimeLivedata = "1.7.2"
@@ -121,6 +122,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-v2110 = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
 riobottomnavigation = { module = "com.github.0xRahad:RioBottomNavigation", version.ref = "riobottomnavigation" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
 tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflowLite" }
 tensorflow-lite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflowLiteGpu" }
 tensorflow-lite-gpu-deligate-plugin = { module = "org.tensorflow:tensorflow-lite-gpu-deligate-plugin", version.ref = "tensorflowLiteGpuDeligatePlugin" }

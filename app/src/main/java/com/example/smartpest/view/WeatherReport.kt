@@ -1,203 +1,80 @@
 package com.example.smartpest.view
 
-import android.os.Build
-import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresExtension
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import com.example.smartpest.ui.components.SectionLabel
+import com.example.smartpest.viewmodels.WeatherViewModel
 import com.example.smartpest.weatherapi.NetworkResponse
 import com.example.smartpest.weatherapi.WeatherModel
-import com.example.smartpest.viewmodels.WeatherViewModel
 
-
-@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun WeatherReport(navController: NavController, viewModel: WeatherViewModel) {
-
-    var city by remember {
-        mutableStateOf("")
-    }
-
-    val weatherResult = viewModel.weatherResult.observeAsState()
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    BackHandler {
-        navController.navigate("Home") {
-            popUpTo("Home") { inclusive = true }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            OutlinedTextField(
-                modifier = Modifier.weight(1f),
-                value = city,
-                onValueChange = {
-                    city = it
-                },
-                label = {
-                    Text(text = "Search for any location")
+fun WeatherReport(@Suppress("UNUSED_PARAMETER") navController: NavController, viewModel: WeatherViewModel) {
+    var city by rememberSaveable { mutableStateOf("") }
+    val weather by viewModel.weatherResult.observeAsState()
+    val keyboard = LocalSoftwareKeyboardController.current
+    val search = { viewModel.getData(city); keyboard?.hide(); Unit }
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        Column(Modifier.widthIn(max = 720.dp).fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(22.dp)) {
+            SectionLabel("CONDITIONS AROUND YOUR PATCH")
+            Text("Plan a little ahead.", style = MaterialTheme.typography.headlineLarge)
+            Text("Check local weather to plan watering and outdoor work. Weather alone cannot diagnose a tomato disease.",
+                style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedTextField(city, { city = it }, label = { Text("City or growing location") }, modifier = Modifier.fillMaxWidth(),
+                singleLine = true, shape = MaterialTheme.shapes.medium,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { search() }),
+                trailingIcon = { IconButton(onClick = search) { Icon(Icons.Outlined.Search, "Search weather") } })
+            when (val result = weather) {
+                is NetworkResponse.Success -> WeatherDetails(result.data)
+                is NetworkResponse.Loading -> {
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    Text("Loading local weather…", style = MaterialTheme.typography.bodyMedium)
                 }
-            )
-            IconButton(onClick = {
-                viewModel.getData(city)
-                keyboardController?.hide()
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search for any location"
-                )
-            }
-        }
-
-        when (val result = weatherResult.value) {
-            is NetworkResponse.Error -> {
-                Text(text = result.message)
-            }
-
-            NetworkResponse.Loading -> {
-                CircularProgressIndicator()
-            }
-
-            is NetworkResponse.Success -> {
-                WeatherDetails(data = result.data)
-            }
-
-            null -> {
+                is NetworkResponse.Error -> Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
+                    Text(result.message, Modifier.fillMaxWidth().padding(18.dp), style = MaterialTheme.typography.bodyMedium)
+                }
+                null -> Text("Enter your location to see the current conditions.", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
 }
 
-
 @Composable
 fun WeatherDetails(data: WeatherModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "Location icon",
-                modifier = Modifier.size(40.dp)
-            )
-            Text(text = data.location.name, fontSize = 30.sp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = data.location.country, fontSize = 18.sp, color = Color.Gray)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = " ${data.current.temp_c} ° C",
-            fontSize = 56.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        AsyncImage(
-            modifier = Modifier.size(160.dp),
-            model = "https:${data.current.condition.icon}".replace("64x64", "128x128"),
-            contentDescription = "Condition icon"
-        )
-        Text(
-            text = data.current.condition.text,
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center,
-            color = Color.Gray
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    WeatherKeyVal("Humidity", data.current.humidity)
-                    WeatherKeyVal("Participation", data.current.precip_mm + " mm")
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    WeatherKeyVal("Wind Speed", data.current.wind_kph + " km/h")
-                    WeatherKeyVal("Wind Direction", data.current.wind_degree + "° ${data.current.wind_dir}")
-
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    WeatherKeyVal("Local Time", data.location.localtime.split(" ")[1])
-                    WeatherKeyVal("Local Date", data.location.localtime.split(" ")[0])
-                }
-            }
-        }
+    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Text(data.location.name, style = MaterialTheme.typography.headlineMedium)
+        Text(data.location.country, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("${data.current.temp_c}°C", style = MaterialTheme.typography.displayLarge)
+        Text(data.current.condition.text, style = MaterialTheme.typography.titleMedium)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        WeatherKeyVal("Humidity", "${data.current.humidity}%")
+        WeatherKeyVal("Precipitation", "${data.current.precip_mm} mm")
+        WeatherKeyVal("Wind", "${data.current.wind_kph} km/h · ${data.current.wind_dir}")
+        WeatherKeyVal("Last updated", data.current.last_updated)
+        Text("Weather data: WeatherAPI. Current conditions are not a forecast or a disease alert.",
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
 fun WeatherKeyVal(key: String, value: String) {
-    Column(
-        modifier = Modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = value, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Text(text = key, fontWeight = FontWeight.SemiBold, color = Color.Gray)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(key, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
     }
 }

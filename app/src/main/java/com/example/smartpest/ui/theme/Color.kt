@@ -2,11 +2,8 @@ package com.example.smartpest.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Green80 = Color(0xFF66BB6A)
-val GreenGrey80 = Color(0xFF99AAB5)
-val Pink80 = Color(0xFFEFB8C8)
-
-
-val Green40 = Color(0xFF388E3C)
-val GreenGrey40 = Color(0xFF616E7C)
-val Pink40 = Color(0xFF7D5260)
+val LeafGreen = Color(0xFF2C6045)
+val LeafGreenLight = Color(0xFFAFD4B7)
+val TomatoRed = Color(0xFFAD4634)
+val GardenPaper = Color(0xFFF8F8F2)
+val GardenInk = Color(0xFF202D24)

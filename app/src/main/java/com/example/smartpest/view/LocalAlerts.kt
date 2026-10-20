@@ -1,214 +1,100 @@
 package com.example.smartpest.view
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.smartpest.database.alert.Alert
+import com.example.smartpest.ui.components.SectionLabel
 import com.example.smartpest.viewmodels.AlertViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LocalAlerts(navController: NavHostController, alertViewModel: AlertViewModel) {
-
-    LaunchedEffect(Unit) {
-        alertViewModel.deleteOldAlerts()
-    }
-
+fun LocalAlerts(@Suppress("UNUSED_PARAMETER") navController: NavHostController, alertViewModel: AlertViewModel) {
     val context = LocalContext.current
-    var notificationsEnabled by remember {
-        mutableStateOf(isNotificationsEnabled(context))
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var enabled by remember { mutableStateOf(isNotificationsEnabled(context)) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) enabled = isNotificationsEnabled(context) }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            notificationsEnabled = isGranted
-        }
-    )
-    val alerts = alertViewModel.allAlerts.observeAsState().value ?: emptyList()
-
-    BackHandler {
-        navController.navigate("Home") {
-            popUpTo("Home") { inclusive = true }
-        }
-    }
-
-    Scaffold {
-
-        Column(modifier = Modifier.padding(16.dp)) {
-
-            if (!notificationsEnabled) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Notifications are disabled!",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Enable notifications to receive local alerts.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(onClick = {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                } else {
-                                    openNotificationSettings(context)
-                                }
-                            }) {
-                                Text("Enable Notifications")
-                            }
-                        }
+    LaunchedEffect(Unit) { alertViewModel.deleteOldAlerts() }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { enabled = isNotificationsEnabled(context) }
+    val alerts by alertViewModel.allAlerts.observeAsState(emptyList())
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        LazyColumn(Modifier.widthIn(max = 720.dp).fillMaxSize(), contentPadding = PaddingValues(24.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)) {
+            item {
+                SectionLabel("LOCAL NOTICES")
+                Spacer(Modifier.height(10.dp))
+                Text("Stay aware. Grow with care.", style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(10.dp))
+                Text("General advisories received from the notification service. These are not diagnoses or alerts generated from your leaf scans.",
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (!enabled) item {
+                Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) {
+                    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("Notifications are off", style = MaterialTheme.typography.titleMedium)
+                        Text("You can still read saved notices. Turn notifications on if you'd like new advisories.", style = MaterialTheme.typography.bodyMedium)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) TextButton(onClick = { permission.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text("Enable notifications") }
+                        TextButton(onClick = { openNotificationSettings(context) }) { Text("Notification settings") }
                     }
                 }
             }
-        }
-
-        if ( notificationsEnabled && alerts.isEmpty()) {
-            Text(
-                text = "No alerts yet.",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                style = MaterialTheme.typography.displaySmall
-            )
-        } else {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                alerts.forEach { alert ->
-                    AlertCard(
-                        alert = alert,
-                        onDelete = { alertViewModel.deleteAlert(alert.id) }
-                    )
-                }
+            if (alerts.isEmpty()) item {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Spacer(Modifier.height(24.dp))
+                Text("No saved notices", style = MaterialTheme.typography.titleLarge)
+                Spacer(Modifier.height(8.dp))
+                Text("New advisories will appear here when the service sends them. Continue checking your tomatoes regularly.",
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            items(alerts, key = { it.id }) { alert -> AlertCard(alert) { alertViewModel.deleteAlert(alert.id) } }
         }
     }
-
 }
 
 @Composable
 fun AlertCard(alert: Alert, onDelete: () -> Unit) {
-
-    val dateFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Title and Delete Icon Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = alert.title,
-                    style = MaterialTheme.typography.displaySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete alert",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
+    Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.medium) {
+        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(alert.title, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+                IconButton(onClick = onDelete) { Icon(Icons.Outlined.DeleteOutline, "Delete notice", tint = MaterialTheme.colorScheme.error) }
             }
-
-            Text(
-                text = alert.message,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = dateFormat.format(alert.timestamp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Text(alert.message, style = MaterialTheme.typography.bodyMedium)
+            Text(SimpleDateFormat("MMM d, yyyy · HH:mm", Locale.getDefault()).format(Date(alert.timestamp)),
+                style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
 
-fun isNotificationsEnabled(context: Context): Boolean {
-    return NotificationManagerCompat.from(context).areNotificationsEnabled()
-}
+fun isNotificationsEnabled(context: Context): Boolean = NotificationManagerCompat.from(context).areNotificationsEnabled()
 
 fun openNotificationSettings(context: Context) {
-    val intent = Intent().apply {
-        action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-    }
-    context.startActivity(intent)
+    context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
 }
